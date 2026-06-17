@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MS · Quotation</title>
+    <!-- Favicon: simple text "MS" -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold' fill='%231a3a5c'>MS</text></svg>" />
+
+    <!-- jsPDF + AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js">
+    </script>
+
+    <style>
+        /* ============================================================
+           RESET & BASE — Professional Industrial ERP
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --steel: #1a3a5c;
+            --steel-light: #2c5a7a;
+            --steel-pale: #e8eef4;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dde1e6;
+            --gray-400: #ced4da;
+            --gray-600: #6c757d;
+            --gray-800: #1e2a36;
+            --white: #ffffff;
+            --danger: #b02a37;
+            --success: #1e7e34;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --radius: 6px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        html {
+            font-family: var(--font);
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--gray-800);
+            background: #f1f4f8;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 24px 20px 120px 20px;
+            background: #f1f4f8;
+        }
+
+        .app-container {
+            max-width: 1380px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 32px 36px 40px 36px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ============================================================
+           HEADER with Logo
+           ============================================================ */
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--steel);
+            margin-bottom: 28px;
+        }
+
+        .company-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .company-header .brand img {
+            height: 44px;
+            width: auto;
+            max-height: 50px;
+            object-fit: contain;
+        }
+
+        .company-header .brand .text-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .company-header .brand .text-group h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--steel);
+            line-height: 1.2;
+        }
+
+        .company-header .brand .text-group .sub {
+            font-size: 13px;
+            color: var(--gray-600);
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        .header-badge {
+            text-align: right;
+        }
+
+        .header-badge .quotation-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-badge .quotation-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--steel);
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================
+           FORM GRID
+           ============================================================ */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--gray-600);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: var(--font);
+            background: var(--white);
+            transition: border 0.15s;
+            width: 100%;
+            color: var(--gray-800);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--steel-light);
+            box-shadow: 0 0 0 3px rgba(26, 75, 109, 0.10);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 44px;
+            line-height: 1.4;
+        }
+
+        /* ============================================================
+           MATERIAL SEARCH (Combobox) — Portal to body
+           ============================================================ */
+        .combobox-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .combobox-input {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: var(--font);
+            width: 100%;
+            background: var(--white);
+            color: var(--gray-800);
+            transition: border 0.15s;
+        }
+
+        .combobox-input:focus {
+            outline: none;
+            border-color: var(--steel-light);
+            box-shadow: 0 0 0 3px rgba(26, 75, 109, 0.10);
+        }
+
+        .combobox-dropdown-portal {
+            position: fixed;
+            z-index: 999999;
+            max-height: 400px;
+            overflow-y: auto;
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+            min-width: 280px;
+            width: auto;
+            padding: 4px 0;
+            display: none;
+        }
+
+        .combobox-dropdown-portal.open {
+            display: block;
+        }
+
+        .combobox-dropdown-portal .dropdown-item {
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-200);
+            transition: background 0.08s;
+        }
+
+        .combobox-dropdown-portal .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .combobox-dropdown-portal .dropdown-item:hover,
+        .combobox-dropdown-portal .dropdown-item.active {
+            background: var(--steel-pale);
+        }
+
+        .combobox-dropdown-portal .dropdown-item .kg-badge {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            padding: 2px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .combobox-dropdown-portal .no-result {
+            padding: 16px 16px;
+            color: var(--gray-600);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .combobox-dropdown-portal::-webkit-scrollbar {
+            width: 6px;
+        }
+        .combobox-dropdown-portal::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 6px;
+        }
+        .combobox-dropdown-portal::-webkit-scrollbar-thumb {
+            background: var(--gray-400);
+            border-radius: 6px;
+        }
+        .combobox-dropdown-portal::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-600);
+        }
+
+        /* ============================================================
+           ITEMS TABLE
+           ============================================================ */
+        .items-section {
+            margin-top: 8px;
+            margin-bottom: 24px;
+        }
+
+        .items-section .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--steel);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1100px;
+        }
+
+        .items-table thead {
+            background: var(--steel);
+            color: var(--white);
+        }
+
+        .items-table th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            color: var(--white);
+        }
+
+        .items-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .items-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .items-table .col-sno {
+            min-width: 40px;
+            text-align: center;
+        }
+        .items-table .col-material {
+            min-width: 180px;
+        }
+        .items-table .col-kgpipe {
+            min-width: 80px;
+        }
+        .items-table .col-qty {
+            min-width: 80px;
+        }
+        .items-table .col-unit {
+            min-width: 60px;
+        }
+        .items-table .col-price {
+            min-width: 90px;
+        }
+        .items-table .col-price-unit {
+            min-width: 70px;
+        }
+        .items-table .col-total {
+            min-width: 110px;
+            font-weight: 600;
+            text-align: right;
+        }
+        .items-table .col-remarks {
+            min-width: 80px;
+        }
+        .items-table .col-delete {
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .items-table input,
+        .items-table select {
+            padding: 4px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--white);
+            width: 100%;
+            color: var(--gray-800);
+            transition: border 0.12s;
+        }
+
+        .items-table input:focus,
+        .items-table select:focus {
+            outline: none;
+            border-color: var(--steel-light);
+            box-shadow: 0 0 0 2px rgba(26, 75, 109, 0.08);
+        }
+
+        .items-table input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .items-table input[type="number"]::-webkit-outer-spin-button,
+        .items-table input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .items-table .kgpipe-display {
+            font-weight: 500;
+            color: var(--steel);
+            background: var(--steel-pale);
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 13px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .items-table .delete-btn {
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.12s, color 0.12s;
+            line-height: 1;
+        }
+
+        .items-table .delete-btn:hover {
+            background: #fde8e8;
+            color: var(--danger);
+        }
+
+        .items-table .row-total {
+            font-weight: 600;
+            text-align: right;
+            color: var(--steel);
+            font-size: 14px;
+        }
+
+        .add-item-row {
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .add-item-row .add-btn {
+            background: var(--steel);
+            color: var(--white);
+            border: none;
+            padding: 8px 22px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: var(--font);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-item-row .add-btn:hover {
+            background: var(--steel-light);
+        }
+
+        .add-item-row .add-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================
+           SUMMARY
+           ============================================================ */
+        .summary-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .summary-grid {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .summary-row .label {
+            color: var(--gray-600);
+        }
+        .summary-row .value {
+            font-weight: 500;
+        }
+
+        .summary-row.total {
+            font-size: 18px;
+            font-weight: 700;
+            padding-top: 8px;
+            border-top: 2px solid var(--steel);
+            margin-top: 4px;
+            color: var(--steel);
+        }
+
+        .summary-row.gst .value {
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           ACTION BUTTONS
+           ============================================================ */
+        .actions-area {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 2px solid var(--gray-200);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .actions-area .btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 14px;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s, transform 0.08s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.2px;
+        }
+
+        .actions-area .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--steel);
+            border: 1.5px solid var(--steel);
+        }
+        .btn-outline:hover {
+            background: var(--steel-pale);
+        }
+
+        .btn-primary {
+            background: var(--steel);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--steel-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+        .btn-success:hover {
+            background: #146c2a;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background: #8f1f2a;
+        }
+
+        .btn-client-pdf {
+            background: var(--steel);
+            color: var(--white);
+            padding: 12px 38px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(26, 75, 109, 0.25);
+        }
+        .btn-client-pdf:hover {
+            background: var(--steel-light);
+            box-shadow: 0 6px 16px rgba(26, 75, 109, 0.30);
+        }
+
+        /* ============================================================
+           STICKY FLOATING ACTION
+           ============================================================ */
+        .sticky-action {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .sticky-action>* {
+            pointer-events: auto;
+        }
+
+        .sticky-action .sticky-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: var(--font);
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+            transition: background 0.15s, transform 0.08s, box-shadow 0.15s;
+            background: var(--steel);
+            color: var(--white);
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sticky-action .sticky-btn:hover {
+            background: var(--steel-light);
+            box-shadow: 0 8px 32px rgba(26, 75, 109, 0.25);
+        }
+
+        .sticky-action .sticky-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 420px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: var(--white);
+            border-left: 5px solid var(--steel);
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+            font-size: 14px;
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            animation: slideIn 0.25s ease-out;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast .toast-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ============================================================
+           MOBILE CARD LAYOUT
+           ============================================================ */
+        .mobile-card-list {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .mobile-card-list .item-card {
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 14px 16px 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .mobile-card-list .item-card .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mobile-card-list .item-card .card-row .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            letter-spacing: 0.3px;
+            min-width: 60px;
+        }
+
+        .mobile-card-list .item-card .card-row .card-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-800);
+            flex: 1;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .mobile-card-list .item-card .card-row .card-value.material-name {
+            font-weight: 600;
+            color: var(--steel);
+        }
+
+        .mobile-card-list .item-card .card-row .card-value.total {
+            font-weight: 700;
+            color: var(--steel);
+            font-size: 16px;
+        }
+
+        .mobile-card-list .item-card .card-delete {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--gray-600);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+
+        .mobile-card-list .item-card .card-delete:hover {
+            background: #fde8e8;
+            color: var(--danger);
+        }
+
+        .mobile-card-list .item-card .card-input {
+            padding: 4px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--white);
+            width: 100%;
+            max-width: 140px;
+            color: var(--gray-800);
+        }
+
+        .mobile-card-list .item-card .card-input:focus {
+            outline: none;
+            border-color: var(--steel-light);
+        }
+
+        .mobile-card-list .item-card .card-select {
+            padding: 4px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: var(--font);
+            background: var(--white);
+            color: var(--gray-800);
+        }
+
+        .mobile-card-list .item-card .inline-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .mobile-card-list .item-card .card-input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .mobile-card-list .item-card .card-input[type="number"]::-webkit-outer-spin-button,
+        .mobile-card-list .item-card .card-input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 820px) {
+            .app-container {
+                padding: 20px 16px 28px 16px;
+                border-radius: 8px;
+            }
+
+            .company-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .company-header .brand {
+                width: 100%;
+            }
+            .company-header .header-badge {
+                text-align: left;
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .items-table {
+                display: none;
+            }
+            .mobile-card-list {
+                display: flex;
+            }
+
+            .summary-grid {
+                max-width: 100%;
+            }
+
+            .actions-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .actions-area .btn {
+                justify-content: center;
+                padding: 12px 20px;
+            }
+
+            .sticky-action {
+                bottom: 20px;
+                right: 20px;
+            }
+            .sticky-action .sticky-btn {
+                padding: 10px 20px;
+                font-size: 13px;
+                border-radius: 32px;
+            }
+
+            .add-item-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .add-item-row .add-btn {
+                justify-content: center;
+            }
+
+            .toast-container {
+                top: 12px;
+                right: 12px;
+                max-width: calc(100% - 24px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 8px 100px 8px;
+            }
+            .app-container {
+                padding: 14px 10px 20px 10px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .company-header .brand .text-group h1 {
+                font-size: 20px;
+            }
+            .header-badge .quotation-number {
+                font-size: 17px;
+            }
+            .mobile-card-list .item-card {
+                padding: 12px 12px 12px 12px;
+            }
+            .mobile-card-list .item-card .card-row .card-value {
+                font-size: 13px;
+            }
+            .sticky-action {
+                bottom: 12px;
+                right: 12px;
+            }
+            .sticky-action .sticky-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+                border-radius: 28px;
+            }
+            .toast-container {
+                top: 8px;
+                right: 8px;
+                max-width: calc(100% - 16px);
+            }
+            .toast {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+        }
+
+        @media (min-width: 821px) {
+            .mobile-card-list {
+                display: none !important;
+            }
+            .items-table {
+                display: table;
+            }
+        }
+
+        /* ============================================================
+           CONFIRM OVERLAY
+           ============================================================ */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.30);
+            z-index: 9999998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .confirm-overlay.open {
+            display: flex;
+        }
+        .confirm-box {
+            background: var(--white);
+            padding: 32px 40px;
+            border-radius: 12px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+            text-align: center;
+        }
+        .confirm-box h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--steel);
+        }
+        .confirm-box p {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+        .confirm-box .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .confirm-box .btn-group .btn {
+            padding: 8px 28px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+        .confirm-box .btn-group .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+        .confirm-box .btn-group .btn-confirm {
+            background: var(--danger);
+            color: var(--white);
+        }
+        .confirm-box .btn-group .btn-confirm:hover {
+            background: #8f1f2a;
+        }
+        .confirm-box .btn-group .btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        .text-muted {
+            color: var(--gray-600);
+        }
+        .text-right {
+            text-align: right;
+        }
+        .fw-600 {
+            font-weight: 600;
+        }
+        .fs-12 {
+            font-size: 12px;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+
+        /* custom input masks */
+        .phone-input {
+            letter-spacing: 0.5px;
+        }
+        .gst-input {
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    CONFIRM OVERLAY
+    ============================================================ -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <h3>Start New Quotation?</h3>
+            <p>All current data will be cleared. This cannot be undone.</p>
+            <div class="btn-group">
+                <button class="btn btn-cancel" id="confirmCancel">Cancel</button>
+                <button class="btn btn-confirm" id="confirmOk">Clear &amp; Start New</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app-container" id="app">
+
+        <!-- HEADER with Logo -->
+        <div class="company-header">
+            <div class="brand">
+                <!-- Logo image: will show if exists, otherwise hidden via onerror -->
+                <img id="headerLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
+                     style="display:none; height:44px; width:auto; max-height:50px; object-fit:contain;"
+                     onerror="this.style.display='none'" 
+                     onload="this.style.display='inline-block'" />
+                <div class="text-group">
+                    <h1>Muthyam Steel Private Limited</h1>
+                    <div class="sub">Steel · Structural · Engineering</div>
+                </div>
+            </div>
+            <div class="header-badge">
+                <div class="quotation-label">Quotation</div>
+                <div class="quotation-number" id="quotationNumberDisplay">MSPL/TS/2025-26/001</div>
+            </div>
+        </div>
+
+        <!-- CLIENT INFORMATION -->
+        <div class="form-grid" id="clientSection">
+            <div class="form-group">
+                <label for="quoteDate">Date</label>
+                <input type="date" id="quoteDate" />
+            </div>
+            <div class="form-group">
+                <label for="clientName">Client Name</label>
+                <input type="text" id="clientName" placeholder="e.g. ABC Constructions" />
+            </div>
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g. ABC Constructions Pvt Ltd" />
+            </div>
+            <div class="form-group">
+                <label for="clientPhone">Phone</label>
+                <div style="display:flex; align-items:center; gap:4px; border:1px solid var(--gray-300); border-radius:var(--radius); background:var(--white); padding:0 8px;">
+                    <span style="font-weight:600; color:var(--gray-600); font-size:14px;">+91</span>
+                    <input type="tel" id="clientPhone" class="phone-input" placeholder="98765 43210" maxlength="11" style="border:none; padding:8px 0; width:100%; background:transparent; font-size:14px; outline:none;" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="clientEmail">Email</label>
+                <input type="email" id="clientEmail" placeholder="client@example.com" />
+            </div>
+            <div class="form-group">
+                <label for="deliveryAddress">Delivery Address</label>
+                <input type="text" id="deliveryAddress" placeholder="Site address" />
+            </div>
+            <div class="form-group">
+                <label for="clientGst">GST Number</label>
+                <input type="text" id="clientGst" class="gst-input" placeholder="e.g. 36AACCN7242C1ZQ" maxlength="15" />
+            </div>
+            <div class="form-group">
+                <label for="clientState">State Code</label>
+                <input type="text" id="clientState" placeholder="e.g. 36" maxlength="2" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="remarks">Remarks</label>
+                <textarea id="remarks" rows="1" placeholder="Any special instructions or notes"></textarea>
+            </div>
+        </div>
+
+        <!-- ITEMS SECTION -->
+        <div class="items-section">
+            <div class="section-title">Materials</div>
+
+            <!-- Desktop Table -->
+            <div class="table-responsive">
+                <table class="items-table" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th class="col-sno">S.No</th>
+                            <th class="col-material">Item</th>
+                            <th class="col-kgpipe">Weight / Pipe</th>
+                            <th class="col-qty">Quantity</th>
+                            <th class="col-unit">Unit</th>
+                            <th class="col-price">Price</th>
+                            <th class="col-price-unit">Price Unit</th>
+                            <th class="col-total">Total Amount</th>
+                            <th class="col-remarks">Remarks</th>
+                            <th class="col-delete"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <!-- rows inserted by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card List -->
+            <div class="mobile-card-list" id="mobileCardList">
+                <!-- cards inserted by JS -->
+            </div>
+
+            <!-- Add Row -->
+            <div class="add-item-row">
+                <div style="flex:1;min-width:180px;">
+                    <div class="combobox-wrapper" id="materialCombobox">
+                        <input type="text" class="combobox-input" id="materialSearchInput"
+                        placeholder="Search material…" autocomplete="off" />
+                    </div>
+                </div>
+                <button class="add-btn" id="addItemBtn">+ Add Item</button>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-section">
+            <div class="summary-grid">
+                <div class="summary-row">
+                    <span class="label">Subtotal</span>
+                    <span class="value" id="subtotalDisplay">₹ 0.00</span>
+                </div>
+                <div class="summary-row gst">
+                    <span class="label">GST (18%)</span>
+                    <span class="value" id="gstDisplay">₹ 0.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span class="label">Grand Total</span>
+                    <span class="value" id="grandTotalDisplay">₹ 0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions-area" id="actionArea">
+            <button class="btn btn-secondary" id="saveDraftBtn">Save Draft</button>
+            <button class="btn btn-outline" id="newQuotationBtn">New Quotation</button>
+            <button class="btn btn-secondary" id="internalCopyBtn">Generate Internal Copy</button>
+            <button class="btn btn-client-pdf" id="clientPdfBtn">Generate Client PDF</button>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    STICKY FLOATING ACTION
+    ============================================================ -->
+    <div class="sticky-action" id="stickyAction">
+        <button class="sticky-btn" id="stickyPdfBtn">Generate PDF</button>
+    </div>
+
+    <!-- ============================================================
+    DROPDOWN PORTAL (rendered on body)
+    ============================================================ -->
+    <div class="combobox-dropdown-portal" id="materialDropdownPortal"></div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            // MATERIAL DATA
+            // ============================================================
+            const MATERIALS = [
+                { name: 'ZPLUS N-100 X 3.0MM', kgPipe: 50.36 },
+                { name: 'ZPLUS N-25 X 2.0MM', kgPipe: 9.84 },
+                { name: 'ZPLUS N-25 X 2.6MM', kgPipe: 12.05 },
+                { name: 'ZPLUS N-40 X 1.8MM', kgPipe: 12.79 },
+                { name: 'ZPLUS N-50 X 2.0MM', kgPipe: 18.23 },
+                { name: 'ZPLUS N-65 X 2.0MM', kgPipe: 22.91 },
+                { name: 'ZPLUS N-80 X 2.0MM', kgPipe: 27.02 },
+                { name: 'ZPLUS RHS 50X25X1.6MM', kgPipe: 12.01 },
+                { name: 'ZPLUS RHS 60X40X2.0MM', kgPipe: 19.14 },
+                { name: 'ZPLUS RHS 75X25X2.0MM', kgPipe: 19.26 },
+                { name: 'ZPLUS RHS 80X40X2.0MM', kgPipe: 23.36 },
+                { name: 'ZPLUS RHS 96X48X2.0MM', kgPipe: 27.66 },
+                { name: 'ZPLUS SHS 100X100X2.5MM', kgPipe: 47.65 },
+                { name: 'ZPLUS SHS 20X20X1.6MM', kgPipe: 5.97 },
+                { name: 'ZPLUS SHS 20X20X2.0MM', kgPipe: 7.39 },
+                { name: 'ZPLUS SHS 25X25X1.6MM', kgPipe: 7.60 },
+                { name: 'ZPLUS SHS 25X25X2.0MM', kgPipe: 9.16 },
+                { name: 'ZPLUS SHS 32X32X2.0MM', kgPipe: 11.81 },
+                { name: 'ZPLUS SHS 40X40X1.6MM', kgPipe: 12.33 },
+                { name: 'ZPLUS SHS 40X40X2.0MM', kgPipe: 15.14 },
+                { name: 'ZPLUS SHS 40X40X2.6MM', kgPipe: 18.90 },
+                { name: 'ZPLUS SHS 50X50X1.6MM', kgPipe: 15.43 },
+                { name: 'ZPLUS SHS 50X50X2.0MM', kgPipe: 19.22 },
+                { name: 'ZPLUS SHS 50X50X2.6MM', kgPipe: 23.12 },
+                { name: 'ZPLUS SHS 72X72X2.0MM', kgPipe: 27.73 },
+                { name: 'ZPLUS SHS 72X72X2.6MM', kgPipe: 34.33 },
+                { name: 'GP-RHS 40X20X1.2MM', kgPipe: 20.18 },
+                { name: 'GP-RHS 40X20X1.4MM', kgPipe: 7.80 },
+                { name: 'GP-RHS 40X20X1.6MM', kgPipe: 7.18 },
+                { name: 'GP-RHS 40X20X1.8MM', kgPipe: 23.64 },
+                { name: 'GP-RHS 40X20X2.0MM', kgPipe: 11.86 },
+                { name: 'GP-RHS 50X25X1.2MM', kgPipe: 8.40 },
+                { name: 'GP-RHS 50X25X1.4MM', kgPipe: 10.50 },
+                { name: 'GP-RHS 50X25X1.6MM', kgPipe: 11.00 },
+                { name: 'GP-RHS 50X25X1.8MM', kgPipe: 11.83 },
+                { name: 'GP-RHS 50X25X2.0MM', kgPipe: 13.52 },
+                { name: 'GP-RHS 60X40X1.4MM', kgPipe: 12.73 },
+                { name: 'GP-RHS 60X40X1.6MM', kgPipe: 14.67 },
+                { name: 'GP-RHS 60X40X2.0MM', kgPipe: 19.00 },
+                { name: 'GP-RHS 75X25X1.6MM', kgPipe: 15.08 },
+                { name: 'GP-RHS 80X40X1.6MM', kgPipe: 17.72 },
+                { name: 'GP-RHS 80X40X1.8MM', kgPipe: 20.00 },
+                { name: 'GP-RHS 80X40X2.0MM', kgPipe: 22.00 },
+                { name: 'GP-RHS 96X48X2.0MM', kgPipe: 26.48 },
+                { name: 'GP-SHS 100X100X2.0MM', kgPipe: 38.00 },
+                { name: 'GP-SHS 20X20X1.2MM', kgPipe: 4.62 },
+                { name: 'GP-SHS 20X20X1.4MM', kgPipe: 5.04 },
+                { name: 'GP-SHS 20X20X1.6MM', kgPipe: 5.63 },
+                { name: 'GP-SHS 20X20X1.8MM', kgPipe: 6.29 },
+                { name: 'GP-SHS 20X20X2.0MM', kgPipe: 7.13 },
+                { name: 'GP-SHS 25X25X1.2MM', kgPipe: 5.39 },
+                { name: 'GP-SHS 25X25X2.0MM', kgPipe: 8.60 },
+                { name: 'GP-SHS 40X40X1.2MM', kgPipe: 8.43 },
+                { name: 'GP-SHS 40X40X1.4MM', kgPipe: 10.41 },
+                { name: 'GP-SHS 40X40X1.6MM', kgPipe: 11.67 },
+                { name: 'GP-SHS 40X40X2.0MM', kgPipe: 14.60 },
+                { name: 'GP-SHS 40X40X2.2MM', kgPipe: 15.96 },
+                { name: 'GP-SHS 50X50X1.2MM', kgPipe: 11.13 },
+                { name: 'GP-SHS 50X50X1.4MM', kgPipe: 12.79 },
+                { name: 'GP-SHS 50X50X1.6MM', kgPipe: 14.68 },
+                { name: 'GP-SHS 50X50X2.2MM', kgPipe: 20.31 },
+                { name: 'GP-SHS 60X60X2.0MM', kgPipe: 21.50 },
+                { name: 'GP-SHS 72X72X1.6MM', kgPipe: 21.90 },
+                { name: 'GP-SHS 72X72X2.0MM', kgPipe: 26.66 },
+                { name: 'HAR RHS 75X25X2.0MM 210YST', kgPipe: 56.11 },
+                { name: 'HAR RHS 75X25X1.6MM 210YST', kgPipe: 14.77 },
+                { name: 'HAR RHS 75X25X2.0MM 210YST (18.25)', kgPipe: 18.25 },
+                { name: 'HAR RHS 75X25X1.6MM 210YST (23.83)', kgPipe: 23.83 },
+                { name: 'HAR RHS 95X25X2.0MM 210YST', kgPipe: 21.78 },
+                { name: 'HAR SHS 150X150X2.0MM 210YST', kgPipe: 56.25 },
+                { name: 'RHS DF 100X55X2.0MM 210YST', kgPipe: 27.90 },
+                { name: 'RHS DF 140X80X2.0MM 210YST', kgPipe: 41.14 },
+                { name: 'N-100X2.9MM CHS 210YST', kgPipe: 45.93 },
+                { name: 'N-100X3.2MM CHS 210YST', kgPipe: 51.30 },
+                { name: 'N-125X2.9MM CHS 210YST', kgPipe: 52.46 },
+                { name: 'N-15X2.0MM CHS 210YST', kgPipe: 5.90 },
+                { name: 'N-20X2.6MM CHS 210YST', kgPipe: 9.19 },
+                { name: 'N-25X2.0MM CHS 210YST', kgPipe: 9.55 },
+                { name: 'N-25X2.6MM CHS 210YST', kgPipe: 11.27 },
+                { name: 'N-32X2.0MM CHS 210YST', kgPipe: 12.23 },
+                { name: 'N-32X2.6MM CHS 210YST', kgPipe: 14.58 },
+                { name: 'N-40X1.6MM CHS 210YST', kgPipe: 11.18 },
+                { name: 'N-40X2.0MM CHS 210YST', kgPipe: 13.80 },
+                { name: 'N-50X1.6MM CHS 210YST', kgPipe: 14.02 },
+                { name: 'N-50X2.0MM CHS 210YST', kgPipe: 17.46 },
+                { name: 'N-65X2.0MM CHS 210YST', kgPipe: 22.23 },
+                { name: 'N-65X2.6MM CHS 210YST', kgPipe: 30.65 },
+                { name: 'N-80X2.0MM CHS 210YST', kgPipe: 25.84 },
+                { name: 'N-80X2.6MM CHS 210YST', kgPipe: 32.34 },
+                { name: 'N-80X2.9MM CHS 210YST', kgPipe: 36.08 },
+                { name: 'N-80X3.2MM CHS 210YST', kgPipe: 39.35 },
+                { name: 'RHS 122X61X2.6MM 210YST', kgPipe: 42.16 },
+                { name: 'RHS 122X61X2.9MM 210YST', kgPipe: 46.31 },
+                { name: 'RHS 122X61X3.2MM 210YST', kgPipe: 49.92 },
+                { name: 'RHS 122X61X3.6MM 210YST', kgPipe: 58.17 },
+                { name: 'RHS 145X82X2.9MM 210YST', kgPipe: 58.30 },
+                { name: 'RHS 145X82X4.0MM 210YST', kgPipe: 76.93 },
+                { name: 'RHS 145X82X4.8MM 210YST', kgPipe: 104.93 },
+                { name: 'RHS 172X92X4.8MM 210YST', kgPipe: 109.11 },
+                { name: 'RHS 200X100X2.9MM 210YST', kgPipe: 79.50 },
+                { name: 'RHS 200X100X4.0MM 210YST', kgPipe: 106.80 },
+                { name: 'RHS 40X20X1.6MM 210YST', kgPipe: 8.74 },
+                { name: 'RHS 40X20X2.0MM 210YST', kgPipe: 10.68 },
+                { name: 'RHS 50X25X1.6MM 210YST', kgPipe: 11.03 },
+                { name: 'RHS 50X25X2.0MM 210YST', kgPipe: 13.63 },
+                { name: 'RHS 50X25X2.6MM 210YST', kgPipe: 16.57 },
+                { name: 'RHS 50X25X2.9MM 210YST', kgPipe: 18.46 },
+                { name: 'RHS 60X40X1.6MM 210YST', kgPipe: 15.11 },
+                { name: 'RHS 60X40X2.0MM 210YST', kgPipe: 18.17 },
+                { name: 'RHS 60X40X2.6MM 210YST', kgPipe: 22.15 },
+                { name: 'RHS 60X40X2.9MM 210YST', kgPipe: 24.09 },
+                { name: 'RHS 60X40X3.2MM 210YST', kgPipe: 27.08 },
+                { name: 'RHS 60X40X3.6MM 210YST', kgPipe: 30.00 },
+                { name: 'RHS 60X40X4.0MM 210YST', kgPipe: 35.00 },
+                { name: 'RHS 80X40X1.6MM 210YST', kgPipe: 17.75 },
+                { name: 'RHS 80X40X2.0MM 210YST', kgPipe: 21.94 },
+                { name: 'RHS 80X40X2.6MM 210YST', kgPipe: 27.01 },
+                { name: 'RHS 80X40X2.9MM 210YST', kgPipe: 30.56 },
+                { name: 'RHS 80X40X4.0MM 210YST', kgPipe: 40.55 },
+                { name: 'RHS 96X48X2.0MM 210YST', kgPipe: 26.64 },
+                { name: 'RHS 96X48X2.6MM 210YST', kgPipe: 32.85 },
+                { name: 'RHS 96X48X2.9MM 210YST', kgPipe: 36.70 },
+                { name: 'RHS 96X48X3.2MM 210YST', kgPipe: 38.94 },
+                { name: 'RHS 96X48X3.6MM 210YST', kgPipe: 43.72 },
+                { name: 'RHS 96X48X4.0MM 210YST', kgPipe: 47.84 },
+                { name: 'RHS 96X48X4.8MM 210YST', kgPipe: 63.20 },
+                { name: 'SHS 100X100X2.0MM 210YST', kgPipe: 37.35 },
+                { name: 'SHS 100X100X2.5MM 210YST', kgPipe: 45.53 },
+                { name: 'SHS 100X100X2.9MM 210YST', kgPipe: 50.77 },
+                { name: 'SHS 100X100X4.0MM 210YST', kgPipe: 67.43 },
+                { name: 'SHS 100X100X5.0MM 210YST', kgPipe: 87.17 },
+                { name: 'SHS 132X132X2.9MM 210YST', kgPipe: 68.44 },
+                { name: 'SHS 132X132X4.0MM 210YST', kgPipe: 91.05 },
+                { name: 'SHS 150X150X4.0MM 210YST', kgPipe: 108.04 },
+                { name: 'SHS 150X150X6.0MM 210YST', kgPipe: 160.77 },
+                { name: 'SHS 202X201.6MM 210YST', kgPipe: 5.67 },
+                { name: 'SHS 202X202.0MM 210YST', kgPipe: 6.99 },
+                { name: 'SHS 252X251.6MM 210YST', kgPipe: 7.08 },
+                { name: 'SHS 252X252.0MM 210YST', kgPipe: 8.55 },
+                { name: 'SHS 252X252.6MM 210YST', kgPipe: 10.64 },
+                { name: 'SHS 32X32X1.6MM 210YST', kgPipe: 8.89 },
+                { name: 'SHS 32X32X2.0MM 210YST', kgPipe: 11.36 },
+                { name: 'SHS 32X32X2.9MM 210YST', kgPipe: 15.52 },
+                { name: 'SHS 40X40X1.6MM 210YST', kgPipe: 11.75 },
+                { name: 'SHS 40X40X2.0MM 210YST', kgPipe: 14.53 },
+                { name: 'SHS 40X40X2.6MM 210YST', kgPipe: 17.86 },
+                { name: 'SHS 40X40X2.9MM 210YST', kgPipe: 19.75 },
+                { name: 'SHS 40X40X4.0MM 210YST', kgPipe: 27.20 },
+                { name: 'SHS 50X50X1.6MM 210YST', kgPipe: 14.69 },
+                { name: 'SHS 50X50X2.0MM 210YST', kgPipe: 18.06 },
+                { name: 'SHS 50X50X2.6MM 210YST', kgPipe: 22.37 },
+                { name: 'SHS 50X50X3.2MM 210YST', kgPipe: 25.00 },
+                { name: 'SHS 60X60X2.0MM 210YST', kgPipe: 22.61 },
+                { name: 'SHS 60X60X2.6MM 210YST', kgPipe: 27.40 },
+                { name: 'SHS 60X60X3.2MM 210YST', kgPipe: 33.33 },
+                { name: 'SHS 72X72X2.0MM 210YST', kgPipe: 26.32 },
+                { name: 'SHS 72X72X2.6MM 210YST', kgPipe: 32.65 },
+                { name: 'SHS 72X72X2.9MM 210YST', kgPipe: 36.53 },
+                { name: 'SHS 72X72X3.2MM 210YST', kgPipe: 38.39 },
+                { name: 'SHS 72X72X4.0MM 210YST', kgPipe: 48.46 },
+                { name: 'SHS 80X80X3.2MM 210YST', kgPipe: 44.05 },
+                { name: 'SHS 80X80X4.0MM 210YST', kgPipe: 54.76 },
+                { name: 'N-100X3.6MM CHS 310YST', kgPipe: 57.00 },
+                { name: 'N-100X4.5MM CHS 310YST', kgPipe: 68.96 },
+                { name: 'N-100X5.4MM CHS 310YST', kgPipe: 84.38 },
+                { name: 'N-125X3.2MM CHS 310YST', kgPipe: 59.23 },
+                { name: 'N-125X4.5MM CHS 310YST', kgPipe: 90.89 },
+                { name: 'N-150X3.6MM CHS 310YST', kgPipe: 85.35 },
+                { name: 'N-150X4.5MM CHS 310YST', kgPipe: 108.00 },
+                { name: 'N-200X6.0MM CHS 310YST', kgPipe: 186.15 },
+                { name: 'N-250X5.0MM CHS 310YST', kgPipe: 187.00 },
+                { name: 'N-32X3.2MM CHS 310YST', kgPipe: 17.36 },
+                { name: 'N-50X4.5MM CHS 310YST', kgPipe: 36.92 },
+                { name: 'N-65X4.5MM CHS 310YST', kgPipe: 46.21 },
+                { name: 'N-80X4.0MM CHS 310YST', kgPipe: 49.01 },
+                { name: 'N-80X4.8MM CHS 310YST', kgPipe: 57.76 },
+                { name: 'RHS 122X61X4.5MM 310YST', kgPipe: 68.76 },
+                { name: 'RHS 122X61X5.4MM 310YST', kgPipe: 83.09 },
+                { name: 'RHS 145X82X4.8MM 310YST', kgPipe: 92.40 },
+                { name: 'RHS 172X92X4.8MM 310YST', kgPipe: 111.40 },
+                { name: 'RHS 172X92X5.4MM 310YST', kgPipe: 122.80 },
+                { name: 'RHS 200X100X4.0MM 310YST', kgPipe: 106.77 },
+                { name: 'RHS 200X100X5.0MM 310YST', kgPipe: 132.83 },
+                { name: 'RHS 200X100X6.0MM 310YST', kgPipe: 157.89 },
+                { name: 'RHS 200X100X8.0MM 310YST', kgPipe: 203.00 },
+                { name: 'RHS 240X120X4.0MM 310YST', kgPipe: 124.25 },
+                { name: 'RHS 240X120X5.0MM 310YST', kgPipe: 165.92 },
+                { name: 'RHS 240X120X6.0MM 310YST', kgPipe: 192.00 },
+                { name: 'RHS 240X120X8.0MM 310YST', kgPipe: 241.45 },
+                { name: 'RHS 300X200X10.0MM 310YST', kgPipe: 420.76 },
+                { name: 'RHS 300X200X5.0MM 310YST', kgPipe: 227.76 },
+                { name: 'RHS 300X200X6.0MM 310YST', kgPipe: 270.00 },
+                { name: 'RHS 300X200X8.0MM 310YST', kgPipe: 342.76 },
+                { name: 'RHS 50X25X3.2MM 310YST', kgPipe: 20.30 },
+                { name: 'RHS 50X25X4.0MM 310YST', kgPipe: 23.33 },
+                { name: 'RHS 60X40X4.0MM 310YST', kgPipe: 35.75 },
+                { name: 'RHS 80X40X4.0MM 310YST', kgPipe: 39.58 },
+                { name: 'RHS 96X48X3.2MM 310YST', kgPipe: 39.27 },
+                { name: 'RHS 96X48X4.0MM 310YST', kgPipe: 47.38 },
+                { name: 'RHS 96X48X4.8MM 310YST', kgPipe: 57.63 },
+                { name: 'SHS 100X100X4.0MM 310YST', kgPipe: 69.21 },
+                { name: 'SHS 100X100X5.0MM 310YST', kgPipe: 90.62 },
+                { name: 'SHS 100X100X6.0MM 310YST', kgPipe: 99.33 },
+                { name: 'SHS 113.5X113.5X4.8MM 310YST', kgPipe: 92.73 },
+                { name: 'SHS 132X132X4.8MM 310YST', kgPipe: 110.97 },
+                { name: 'SHS 150X150X4.0MM 310YST', kgPipe: 104.93 },
+                { name: 'SHS 150X150X5.0MM 310YST', kgPipe: 137.65 },
+                { name: 'SHS 150X150X6.0MM 310YST', kgPipe: 153.71 },
+                { name: 'SHS 150X150X8.0MM 310YST', kgPipe: 200.81 },
+                { name: 'SHS 180X180X6.0MM 310YST', kgPipe: 190.77 },
+                { name: 'SHS 200X200X6.0MM 310YST', kgPipe: 230.00 },
+                { name: 'SHS 200X200X8.0MM 310YST', kgPipe: 264.67 },
+                { name: 'SHS 220X220X6.0MM 310YST', kgPipe: 236.66 },
+                { name: 'SHS 220X220X8.0MM 310YST', kgPipe: 314.35 },
+                { name: 'SHS 250X250X6.0MM 310YST', kgPipe: 268.65 },
+                { name: 'SHS 250X250X8.0MM 310YST', kgPipe: 343.50 },
+                { name: 'SHS 25X25X3.2MM 310YST', kgPipe: 12.74 },
+                { name: 'SHS 300X300X8.0MM 310YST', kgPipe: 304.00 },
+                { name: 'SHS 400X400X10.0MM 310YST', kgPipe: 652.27 },
+                { name: 'SHS 40X40X4.0MM 310YST', kgPipe: 25.92 },
+                { name: 'SHS 50X50X3.6MM 310YST', kgPipe: 30.18 },
+                { name: 'SHS 50X50X4.5MM 310YST', kgPipe: 38.06 },
+                { name: 'SHS 60X60X4.0MM 310YST', kgPipe: 39.47 },
+                { name: 'SHS 60X60X4.8MM 310YST', kgPipe: 47.20 },
+                { name: 'SHS 72X72X3.2MM 310YST', kgPipe: 39.38 },
+                { name: 'SHS 72X72X4.0MM 310YST', kgPipe: 46.94 },
+                { name: 'SHS 72X72X4.8MM 310YST', kgPipe: 57.96 },
+                { name: 'SHS 80X80X3.2MM 310YST', kgPipe: 44.73 },
+                { name: 'SHS 80X80X4.0MM 310YST', kgPipe: 55.00 },
+                { name: 'SHS 80X80X4.8MM 310YST', kgPipe: 66.31 },
+                { name: 'SHS 91.5X91.5X4.5MM 310YST', kgPipe: 69.45 },
+                { name: 'N-40X2.6MM 210YST (Scaffold)', kgPipe: 17.26 },
+                { name: 'N-40X2.9MM 210YST (Scaffold)', kgPipe: 19.23 },
+                { name: 'N-40X3.2MM 210YST (Scaffold)', kgPipe: 20.30 },
+                { name: 'N-40X3.6MM 210YST (Scaffold)', kgPipe: 23.36 },
+                { name: 'N-50X2.9MM 210YST (Scaffold)', kgPipe: 23.86 },
+                { name: 'N-50X3.2MM 210YST (Scaffold)', kgPipe: 25.67 },
+                { name: 'N-50X3.6MM 210YST (Scaffold)', kgPipe: 29.64 },
+                { name: 'SHS 400X400X8.0MM 355YST', kgPipe: 602.00 },
+            ];
+
+            MATERIALS.sort((a, b) => a.name.localeCompare(b.name));
+
+            // ============================================================
+            // STATE
+            // ============================================================
+            let items = [];
+            let nextId = 1;
+            let quoteNumberCounter = 1;
+            const STORAGE_KEY = 'muthyam_quotation_draft';
+
+            // DOM refs
+            const $ = id => document.getElementById(id);
+            const quoteNumberDisplay = $('quotationNumberDisplay');
+            const quoteDate = $('quoteDate');
+            const clientName = $('clientName');
+            const companyName = $('companyName');
+            const clientPhone = $('clientPhone');
+            const clientEmail = $('clientEmail');
+            const deliveryAddress = $('deliveryAddress');
+            const clientGst = $('clientGst');
+            const clientState = $('clientState');
+            const remarks = $('remarks');
+            const itemsTableBody = $('itemsTableBody');
+            const mobileCardList = $('mobileCardList');
+            const subtotalDisplay = $('subtotalDisplay');
+            const gstDisplay = $('gstDisplay');
+            const grandTotalDisplay = $('grandTotalDisplay');
+            const materialSearchInput = $('materialSearchInput');
+            const dropdownPortal = $('materialDropdownPortal');
+            const addItemBtn = $('addItemBtn');
+            const saveDraftBtn = $('saveDraftBtn');
+            const newQuotationBtn = $('newQuotationBtn');
+            const internalCopyBtn = $('internalCopyBtn');
+            const clientPdfBtn = $('clientPdfBtn');
+            const stickyPdfBtn = $('stickyPdfBtn');
+            const confirmOverlay = $('confirmOverlay');
+            const confirmCancel = $('confirmCancel');
+            const confirmOk = $('confirmOk');
+
+            let selectedIndex = -1;
+            let filterText = '';
+            let dropdownOpen = false;
+
+            // ============================================================
+            // HELPERS
+            // ============================================================
+            function formatCurrencyDisplay(val) {
+                return '₹ ' + val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            function formatCurrencyPdf(val) {
+                return 'Rs. ' + val.toFixed(2);
+            }
+
+            function parseNumber(v) {
+                if (v === '' || v === null || v === undefined) return 0;
+                const n = parseFloat(v);
+                return isNaN(n) ? 0 : n;
+            }
+
+            function generateQuoteNumber() {
+                const year = new Date().getFullYear();
+                const prefix = 'MSPL/TS/' + (year - 2000) + '-' + String(year - 2000 + 1).slice(-2) + '/';
+                const num = String(quoteNumberCounter).padStart(3, '0');
+                return prefix + num;
+            }
+
+            function updateQuoteNumberDisplay() {
+                quoteNumberDisplay.textContent = generateQuoteNumber();
+            }
+
+            function getFilteredResults() {
+                const q = filterText.toLowerCase().trim();
+                return q ? MATERIALS.filter(m => m.name.toLowerCase().includes(q)) : MATERIALS;
+            }
+
+            // ============================================================
+            // TOAST
+            // ============================================================
+            function showToast(message, type) {
+                const container = $('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast' + (type === 'success' ? ' success' : type === 'error' ? ' error' : '');
+                toast.innerHTML = '<div class="toast-title">' + (type === 'success' ? 'Success' : type === 'error' ? 'Error' :
+                    'Info') + '</div><div>' + message + '</div>';
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(20px)';
+                    toast.style.transition = 'opacity 0.3s, transform 0.3s';
+                    setTimeout(() => toast.remove(), 350);
+                }, 4000);
+            }
+
+            // ============================================================
+            // DROPDOWN (portal on body)
+            // ============================================================
+            function renderDropdown(filter) {
+                const q = filter.toLowerCase().trim();
+                const results = q ? MATERIALS.filter(m => m.name.toLowerCase().includes(q)) : MATERIALS;
+                const display = results.slice(0, 200);
+
+                if (display.length === 0) {
+                    dropdownPortal.innerHTML = '<div class="no-result">No materials found</div>';
+                    dropdownPortal.classList.add('open');
+                    dropdownOpen = true;
+                    selectedIndex = -1;
+                    return;
+                }
+
+                let html = '';
+                display.forEach((m, idx) => {
+                    const active = idx === selectedIndex ? ' active' : '';
+                    html += `<div class="dropdown-item${active}" data-index="${idx}" data-name="${m.name}" data-kg="${m.kgPipe}">
+                                <span>${m.name}</span>
+                                <span class="kg-badge">${m.kgPipe.toFixed(2)} kg/pipe</span>
+                            </div>`;
+                });
+                dropdownPortal.innerHTML = html;
+                dropdownPortal.classList.add('open');
+                dropdownOpen = true;
+
+                if (selectedIndex >= 0 && selectedIndex < display.length) {
+                    const activeEl = dropdownPortal.querySelector('.dropdown-item.active');
+                    if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+                }
+            }
+
+            function positionDropdown() {
+                const input = materialSearchInput;
+                const rect = input.getBoundingClientRect();
+                const top = rect.bottom + 6;
+                const left = rect.left;
+                dropdownPortal.style.top = top + 'px';
+                dropdownPortal.style.left = left + 'px';
+                dropdownPortal.style.width = Math.max(rect.width, 280) + 'px';
+            }
+
+            function closeDropdown() {
+                dropdownPortal.classList.remove('open');
+                dropdownOpen = false;
+                selectedIndex = -1;
+            }
+
+            function selectMaterial(name, kgPipe) {
+                const qty = 1;
+                const price = 0;
+                const priceUnit = 'MT';
+                const qtyUnit = 'PIPE';
+                addItem(name, kgPipe, price, priceUnit, qty, qtyUnit);
+                materialSearchInput.value = '';
+                filterText = '';
+                closeDropdown();
+                showToast('Material added: ' + name, 'success');
+            }
+
+            // ============================================================
+            // ITEMS CRUD
+            // ============================================================
+            function addItem(material, kgPipe, price, priceUnit, qty, qtyUnit) {
+                const id = nextId++;
+                const item = {
+                    id,
+                    material,
+                    kgPipe: parseNumber(kgPipe),
+                    price: parseNumber(price),
+                    priceUnit: priceUnit || 'MT',
+                    qty: parseNumber(qty) || 1,
+                    qtyUnit: qtyUnit || 'PIPE',
+                    lineTotal: 0,
+                    remarks: ''
+                };
+                items.push(item);
+                recalcTotals();
+                renderAll();
+            }
+
+            function deleteItem(id) {
+                items = items.filter(it => it.id !== id);
+                recalcTotals();
+                renderAll();
+            }
+
+            function updateItemField(id, field, value) {
+                const item = items.find(it => it.id === id);
+                if (!item) return;
+
+                let numVal = parseNumber(value);
+
+                if (field === 'price') {
+                    item.price = numVal;
+                } else if (field === 'qty') {
+                    item.qty = numVal >= 0 ? numVal : 0;
+                } else if (field === 'priceUnit') {
+                    item.priceUnit = value;
+                } else if (field === 'qtyUnit') {
+                    item.qtyUnit = value;
+                } else if (field === 'remarks') {
+                    item.remarks = value;
+                } else {
+                    return;
+                }
+
+                recalcTotals();
+                updateRowTotal(id);
+                updateCardTotal(id);
+                updateSummary();
+            }
+
+            function recalcTotals() {
+                let subtotal = 0;
+                for (const it of items) {
+                    let effectivePrice = it.price;
+                    if (it.priceUnit === 'MT') {
+                        effectivePrice = it.price / 1000;
+                    }
+                    let qtyKg = 0;
+                    if (it.qtyUnit === 'PIPE') {
+                        qtyKg = it.qty * it.kgPipe;
+                    } else if (it.qtyUnit === 'MT') {
+                        qtyKg = it.qty * 1000;
+                    } else if (it.qtyUnit === 'KG') {
+                        qtyKg = it.qty;
+                    }
+                    const total = qtyKg * effectivePrice;
+                    it.lineTotal = total;
+                    subtotal += total;
+                }
+                window._subtotal = subtotal;
+                window._gst = subtotal * 0.18;
+                window._grand = subtotal + window._gst;
+            }
+
+            function updateSummary() {
+                const subtotal = window._subtotal || 0;
+                const gst = window._gst || 0;
+                const grand = window._grand || 0;
+                subtotalDisplay.textContent = formatCurrencyDisplay(subtotal);
+                gstDisplay.textContent = formatCurrencyDisplay(gst);
+                grandTotalDisplay.textContent = formatCurrencyDisplay(grand);
+            }
+
+            function updateRowTotal(id) {
+                const item = items.find(it => it.id === id);
+                if (!item) return;
+                const row = itemsTableBody.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    const totalCell = row.querySelector('.row-total');
+                    if (totalCell) totalCell.textContent = formatCurrencyDisplay(item.lineTotal);
+                }
+            }
+
+            function updateCardTotal(id) {
+                const item = items.find(it => it.id === id);
+                if (!item) return;
+                const card = mobileCardList.querySelector(`.item-card[data-id="${id}"]`);
+                if (card) {
+                    const totalSpan = card.querySelector('.card-value.total');
+                    if (totalSpan) totalSpan.textContent = formatCurrencyDisplay(item.lineTotal);
+                }
+            }
+
+            // ============================================================
+            // RENDER
+            // ============================================================
+            function renderAll() {
+                renderTableRows();
+                renderMobileCards();
+                recalcTotals();
+                updateSummary();
+                const hasItems = items.length > 0;
+                document.getElementById('stickyAction').style.display = hasItems ? 'flex' : 'none';
+            }
+
+            function renderTableRows() {
+                if (items.length === 0) {
+                    itemsTableBody.innerHTML =
+                        `<tr><td colspan="10" style="text-align:center;padding:24px 0;color:var(--gray-600);">No items added. Search and add materials above.</td></tr>`;
+                    return;
+                }
+                let html = '';
+                let sno = 1;
+                for (const it of items) {
+                    html += `
+                                <tr data-id="${it.id}">
+                                    <td class="col-sno" style="text-align:center;">${sno}</td>
+                                    <td class="col-material"><strong>${it.material}</strong></td>
+                                    <td class="col-kgpipe"><span class="kgpipe-display">${it.kgPipe.toFixed(2)}</span></td>
+                                    <td class="col-qty">
+                                        <input type="number" step="any" min="0" class="qty-input" value="${it.qty.toFixed(3)}" data-id="${it.id}" />
+                                    </td>
+                                    <td class="col-unit">
+                                        <select class="qty-unit-select" data-id="${it.id}" style="width:auto;min-width:60px;">
+                                            <option value="PIPE" ${it.qtyUnit === 'PIPE' ? 'selected' : ''}>PIPE</option>
+                                            <option value="KG" ${it.qtyUnit === 'KG' ? 'selected' : ''}>KG</option>
+                                            <option value="MT" ${it.qtyUnit === 'MT' ? 'selected' : ''}>MT</option>
+                                        </select>
+                                    </td>
+                                    <td class="col-price">
+                                        <input type="number" step="0.01" min="0" class="price-input" value="${it.price.toFixed(2)}" data-id="${it.id}" />
+                                    </td>
+                                    <td class="col-price-unit">
+                                        <select class="price-unit-select" data-id="${it.id}" style="width:auto;min-width:60px;">
+                                            <option value="MT" ${it.priceUnit === 'MT' ? 'selected' : ''}>MT</option>
+                                            <option value="KG" ${it.priceUnit === 'KG' ? 'selected' : ''}>KG</option>
+                                        </select>
+                                    </td>
+                                    <td class="col-total row-total">${formatCurrencyDisplay(it.lineTotal)}</td>
+                                    <td class="col-remarks">
+                                        <input type="text" class="remarks-input" value="${it.remarks || ''}" data-id="${it.id}" placeholder="-" style="font-size:12px;" />
+                                    </td>
+                                    <td class="col-delete"><button class="delete-btn" data-id="${it.id}">&times;</button></td>
+                                </tr>
+                            `;
+                    sno++;
+                }
+                itemsTableBody.innerHTML = html;
+
+                // Attach events
+                itemsTableBody.querySelectorAll('.price-input').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'price', this.value);
+                    });
+                });
+                itemsTableBody.querySelectorAll('.price-unit-select').forEach(el => {
+                    el.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'priceUnit', this.value);
+                    });
+                });
+                itemsTableBody.querySelectorAll('.qty-input').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'qty', this.value);
+                    });
+                });
+                itemsTableBody.querySelectorAll('.qty-unit-select').forEach(el => {
+                    el.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'qtyUnit', this.value);
+                    });
+                });
+                itemsTableBody.querySelectorAll('.remarks-input').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'remarks', this.value);
+                    });
+                });
+                itemsTableBody.querySelectorAll('.delete-btn').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        deleteItem(id);
+                    });
+                });
+            }
+
+            function renderMobileCards() {
+                if (items.length === 0) {
+                    mobileCardList.innerHTML =
+                        `<div style="padding:20px;text-align:center;color:var(--gray-600);font-size:14px;">No items added. Search and add materials above.</div>`;
+                    return;
+                }
+                let html = '';
+                let sno = 1;
+                for (const it of items) {
+                    html += `
+                                <div class="item-card" data-id="${it.id}">
+                                    <button class="card-delete" data-id="${it.id}">&times;</button>
+                                    <div class="card-row">
+                                        <span class="card-label">#${sno}</span>
+                                        <span class="card-value material-name">${it.material}</span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="card-label">Kg/Pipe</span>
+                                        <span class="card-value">${it.kgPipe.toFixed(2)}</span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="card-label">Qty</span>
+                                        <span class="card-value">
+                                            <input type="number" step="any" min="0" class="card-input qty-input-mobile" value="${it.qty.toFixed(3)}" data-id="${it.id}" style="max-width:100px;" />
+                                            <select class="card-select qty-unit-select-mobile" data-id="${it.id}" style="max-width:70px;">
+                                                <option value="PIPE" ${it.qtyUnit === 'PIPE' ? 'selected' : ''}>PIPE</option>
+                                                <option value="KG" ${it.qtyUnit === 'KG' ? 'selected' : ''}>KG</option>
+                                                <option value="MT" ${it.qtyUnit === 'MT' ? 'selected' : ''}>MT</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="card-label">Price</span>
+                                        <span class="card-value">
+                                            <input type="number" step="0.01" min="0" class="card-input price-input-mobile" value="${it.price.toFixed(2)}" data-id="${it.id}" style="max-width:110px;" />
+                                            <select class="card-select price-unit-select-mobile" data-id="${it.id}" style="max-width:70px;">
+                                                <option value="MT" ${it.priceUnit === 'MT' ? 'selected' : ''}>MT</option>
+                                                <option value="KG" ${it.priceUnit === 'KG' ? 'selected' : ''}>KG</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="card-label">Remarks</span>
+                                        <span class="card-value">
+                                            <input type="text" class="card-input remarks-input-mobile" value="${it.remarks || ''}" data-id="${it.id}" placeholder="-" style="max-width:150px;font-size:12px;" />
+                                        </span>
+                                    </div>
+                                    <div class="card-row" style="border-top:1px solid var(--gray-200);padding-top:6px;margin-top:4px;">
+                                        <span class="card-label" style="font-weight:700;">Total</span>
+                                        <span class="card-value total">${formatCurrencyDisplay(it.lineTotal)}</span>
+                                    </div>
+                                </div>
+                            `;
+                    sno++;
+                }
+                mobileCardList.innerHTML = html;
+
+                // Events for mobile
+                mobileCardList.querySelectorAll('.price-input-mobile').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'price', this.value);
+                    });
+                });
+                mobileCardList.querySelectorAll('.price-unit-select-mobile').forEach(el => {
+                    el.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'priceUnit', this.value);
+                    });
+                });
+                mobileCardList.querySelectorAll('.qty-input-mobile').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'qty', this.value);
+                    });
+                });
+                mobileCardList.querySelectorAll('.qty-unit-select-mobile').forEach(el => {
+                    el.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'qtyUnit', this.value);
+                    });
+                });
+                mobileCardList.querySelectorAll('.remarks-input-mobile').forEach(el => {
+                    el.addEventListener('input', function() {
+                        const id = parseInt(this.dataset.id);
+                        updateItemField(id, 'remarks', this.value);
+                    });
+                });
+                mobileCardList.querySelectorAll('.card-delete').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        deleteItem(id);
+                    });
+                });
+            }
+
+            // ============================================================
+            // DRAFT
+            // ============================================================
+            function saveDraft() {
+                const draft = {
+                    quoteNumber: quoteNumberCounter,
+                    date: quoteDate.value,
+                    clientName: clientName.value,
+                    companyName: companyName.value,
+                    phone: clientPhone.value,
+                    email: clientEmail.value,
+                    deliveryAddress: deliveryAddress.value,
+                    clientGst: clientGst.value,
+                    clientState: clientState.value,
+                    remarks: remarks.value,
+                    items: items.map(it => ({ ...it })),
+                    nextId: nextId,
+                };
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+                    showToast('Draft saved successfully.', 'success');
+                } catch (e) {
+                    showToast('Failed to save draft.', 'error');
+                }
+            }
+
+            function loadDraft() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return false;
+                    const draft = JSON.parse(raw);
+                    quoteNumberCounter = draft.quoteNumber || 1;
+                    quoteDate.value = draft.date || '';
+                    clientName.value = draft.clientName || '';
+                    companyName.value = draft.companyName || '';
+                    clientPhone.value = draft.phone || '';
+                    clientEmail.value = draft.email || '';
+                    deliveryAddress.value = draft.deliveryAddress || '';
+                    clientGst.value = draft.clientGst || '';
+                    clientState.value = draft.clientState || '';
+                    remarks.value = draft.remarks || '';
+                    items = draft.items || [];
+                    nextId = draft.nextId || 1;
+                    updateQuoteNumberDisplay();
+                    renderAll();
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function clearAllData() {
+                items = [];
+                nextId = 1;
+                quoteNumberCounter++;
+                updateQuoteNumberDisplay();
+                quoteDate.value = '';
+                clientName.value = '';
+                companyName.value = '';
+                clientPhone.value = '';
+                clientEmail.value = '';
+                deliveryAddress.value = '';
+                clientGst.value = '';
+                clientState.value = '';
+                remarks.value = '';
+                materialSearchInput.value = '';
+                filterText = '';
+                closeDropdown();
+                renderAll();
+                localStorage.removeItem(STORAGE_KEY);
+            }
+
+            // ============================================================
+            // LOGO LOADER - uses the already-loaded DOM image for reliability
+            // ============================================================
+            function loadLogoAsBase64() {
+                return new Promise((resolve) => {
+                    // First try to use the image already displayed on the page
+                    const imgElement = document.getElementById('headerLogo');
+                    if (imgElement && imgElement.complete && imgElement.naturalWidth > 0) {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = imgElement.naturalWidth;
+                            canvas.height = imgElement.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(imgElement, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            resolve(dataUrl);
+                            return;
+                        } catch (e) {
+                            // fall through to fallback
+                        }
+                    }
+
+                    // Fallback: load fresh from the path
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        try {
+                            const dataUrl = canvas.toDataURL('image/png');
+                            resolve(dataUrl);
+                        } catch (e) {
+                            resolve(null);
+                        }
+                    };
+                    img.onerror = function() {
+                        resolve(null);
+                    };
+                    img.src = './assets/logo.png';
+                });
+            }
+
+            // ============================================================
+            // PDF GENERATION — Professional with logo
+            // ============================================================
+            async function generateClientPDF(internal) {
+                if (items.length === 0) {
+                    showToast('Add at least one material item before generating PDF.', 'error');
+                    return;
+                }
+
+                const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
+                const pageWidth = 210;
+                const margin = 18;
+                let y = margin;
+
+                // Load logo
+                const logoData = await loadLogoAsBase64();
+
+                // ----- HEADER with Logo -----
+                if (logoData) {
+                    const img = new Image();
+                    img.src = logoData;
+                    const aspect = img.width / img.height || 2;
+                    const w = 30;
+                    const h = 30 / aspect;
+                    doc.addImage(logoData, 'PNG', margin, y - 2, w, h);
+                    y += 4;
+                }
+
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text('MUTHYAM STEEL PRIVATE LIMITED', pageWidth / 2, y, { align: 'center' });
+                y += 7;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Steel · Structural · Engineering', pageWidth / 2, y, { align: 'center' });
+                y += 4;
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'italic');
+                doc.text('Business Development Partner for TATA STRUCTURA', pageWidth / 2, y, { align: 'center' });
+                y += 10;
+
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text('PROFORMA - INVOICE', pageWidth / 2, y, { align: 'center' });
+                y += 8;
+
+                // ----- TWO-COLUMN DETAILS -----
+                doc.setFontSize(8.5);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Customer Details :', margin, y);
+                y += 5;
+
+                const leftX = margin;
+                const rightX = margin + 100;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+
+                let leftLines = [];
+                if (clientName.value) leftLines.push(['Name', clientName.value]);
+                if (companyName.value) leftLines.push(['Company', companyName.value]);
+                if (deliveryAddress.value) leftLines.push(['Address', deliveryAddress.value]);
+                if (clientPhone.value) leftLines.push(['Ph. No.', '+91 ' + clientPhone.value]);
+                if (clientEmail.value) leftLines.push(['Email Id', clientEmail.value]);
+                if (clientGst.value) leftLines.push(['GST No.', clientGst.value]);
+                if (clientState.value) leftLines.push(['State Code', clientState.value]);
+
+                const qNum = generateQuoteNumber();
+                const dateStr = quoteDate.value ? new Date(quoteDate.value).toLocaleDateString('en-IN', { day: '2-digit',
+                    month: 'short', year: 'numeric' }) : 'Not set';
+                let rightLines = [
+                    ['Date', dateStr],
+                    ['Quotation No.', qNum],
+                    ['GST.No: Telangana', '36AACCN7242C1ZQ'],
+                    ['GST.No: Andhra Pradesh', '37AACCN7242C1ZO'],
+                    ['H.S.N Code (CHS)', '7306.30.90'],
+                    ['H.S.N Code (RHS & SHS)', '7306.61.00'],
+                    ['Grade', 'IS 1161_CHS / IS 4923_RHS & SHS'],
+                    ['Contact Person', clientName.value || 'Mr'],
+                    ['Contact No.', clientPhone.value ? '+91 ' + clientPhone.value : ''],
+                    ['Mail Id', clientEmail.value || '']
+                ];
+
+                let lx = leftX;
+                let ly = y;
+                for (const line of leftLines) {
+                    doc.text(line[0] + ' :', lx, ly);
+                    doc.text(line[1] || '-', lx + 40, ly);
+                    ly += 5;
+                }
+
+                let rx = rightX;
+                let ry = y;
+                for (const line of rightLines) {
+                    doc.text(line[0] + ' :', rx, ry);
+                    doc.text(line[1] || '-', rx + 55, ry);
+                    ry += 5;
+                }
+
+                y = Math.max(ly, ry) + 4;
+
+                // ----- MATERIAL TABLE -----
+                const tableData = items.map((it, idx) => {
+                    let unitDisplay = it.qtyUnit;
+                    let priceDisplay = it.price.toFixed(2) + ' / ' + it.priceUnit;
+                    return [
+                        String(idx + 1),
+                        it.material,
+                        it.kgPipe.toFixed(2),
+                        it.qty.toFixed(3),
+                        unitDisplay,
+                        priceDisplay,
+                        formatCurrencyPdf(it.lineTotal),
+                        it.remarks || ''
+                    ];
+                });
+
+                doc.autoTable({
+                    startY: y,
+                    head: [
+                        ['S.No', 'Description', 'Weight/Pipe', 'Quantity', 'Unit', 'Price', 'Amount', 'Remarks']
+                    ],
+                    body: tableData,
+                    theme: 'striped',
+                    headStyles: {
+                        fillColor: [26, 58, 92],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        fontSize: 8,
+                        halign: 'center',
+                    },
+                    styles: {
+                        fontSize: 7.5,
+                        cellPadding: 2.5,
+                        font: 'helvetica',
+                    },
+                    columnStyles: {
+                        0: { halign: 'center', cellWidth: 12 },
+                        1: { cellWidth: 'auto' },
+                        2: { halign: 'center', cellWidth: 22 },
+                        3: { halign: 'center', cellWidth: 20 },
+                        4: { halign: 'center', cellWidth: 14 },
+                        5: { halign: 'right', cellWidth: 22 },
+                        6: { halign: 'right', cellWidth: 28 },
+                        7: { cellWidth: 'auto' },
+                    },
+                    margin: { left: margin, right: margin },
+                    didDrawPage: function(data) {
+                        const pageCount = doc.internal.getNumberOfPages();
+                        const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+                        doc.setFontSize(7);
+                        doc.setFont('helvetica', 'italic');
+                        doc.text('Page ' + currentPage + ' of ' + pageCount, pageWidth - margin, 285, { align: 'right' });
+                        doc.text('Muthyam Steel Private Limited', margin, 285);
+                        const now = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit' });
+                        doc.text('Generated: ' + now, pageWidth - margin, 278, { align: 'right' });
+                    }
+                });
+
+                const finalY = doc.lastAutoTable.finalY + 10;
+
+                // ----- SUMMARY -----
+                const subtotal = window._subtotal || 0;
+                const gst = window._gst || 0;
+                const grand = window._grand || 0;
+
+                const boxX = pageWidth - margin - 85;
+                const boxWidth = 85;
+                const boxY = finalY;
+                const boxHeight = 48;
+                doc.setDrawColor(180);
+                doc.setFillColor(250, 250, 252);
+                doc.rect(boxX, boxY, boxWidth, boxHeight, 'FD');
+
+                let sy = boxY + 5;
+                doc.setFontSize(8.5);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Subtotal', boxX + 6, sy);
+                doc.text(formatCurrencyPdf(subtotal), boxX + boxWidth - 6, sy, { align: 'right' });
+                sy += 7;
+                doc.text('GST (18%)', boxX + 6, sy);
+                doc.text(formatCurrencyPdf(gst), boxX + boxWidth - 6, sy, { align: 'right' });
+                sy += 9;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text('Grand Total', boxX + 6, sy);
+                doc.text(formatCurrencyPdf(grand), boxX + boxWidth - 6, sy, { align: 'right' });
+
+                // ----- TERMS & CONDITIONS (with new page if needed) -----
+                const terms = [
+                    '1. GST @ 18% Included on the above price',
+                    '2. Test Certificates will send as per the requirement.',
+                    '3. Offer Validity up to 00/00/2025',
+                    '4. Tolerance +/- 0.5% variation in quantity to be acceptable.',
+                    '5. Available sections : Lead time of despatch : 1-3 working Days',
+                    '6. Non available sections : Lead time of despatch : 3-4 weeks',
+                    '7. Payment: 100% Advance along with PO.',
+                    '8. All the pipes shall be offered in 6 meters standard length with plain ends',
+                    '9. Transportation : Ex-godown Shamshabad, Dulapally',
+                    '10. Dispute if any, arising out of this sale to subject to R.R Dist. Jurisdiction.'
+                ];
+
+                const termsLineHeight = 4.5;
+                const termsHeight = terms.length * termsLineHeight + 20;
+                const remainingSpace = 285 - (boxY + boxHeight + 10);
+
+                let termsStartY = boxY + boxHeight + 10;
+
+                if (remainingSpace < termsHeight + 20) {
+                    doc.addPage();
+                    termsStartY = margin + 10;
+                }
+
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Terms & Conditions', margin, termsStartY);
+                doc.setFont('helvetica', 'normal');
+                let ty = termsStartY + 5;
+                for (const t of terms) {
+                    doc.text(t, margin + 2, ty);
+                    ty += termsLineHeight;
+                }
+
+                const sigY = ty + 6;
+                doc.text('Prepared By: N. Ephraim', margin, sigY);
+                doc.text('Company: Muthyam Steel Private Limited', margin, sigY + 5);
+                doc.text('Authorized Signature: _________________________', margin, sigY + 12);
+
+                // ----- FOOTER (only on last page) -----
+                const totalPages = doc.internal.getNumberOfPages();
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+                if (currentPage === totalPages) {
+                    const addrY = 272;
+                    doc.setFontSize(6);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(
+                        'HO : 209, Gowra Fountainhead Patrika Nagar, Madhapur, Hyderabad - 500081 | Regd. Office: Plot No.49, New Maruthi Nagar, Kharmanghat, Hyderabad, 500079',
+                        pageWidth / 2, addrY, { align: 'center' });
+                    doc.text(
+                        'Depot: Sy.No.31/A/AA(PART), Hameedullah Village & Grampanchayat, Shamshabad Mandal, RangaReddy Dist-501218 | AP Branch: D.No.76-18-70, Temple Street, Iron Complex, Bhavanipuram, Vijayawada-520012',
+                        pageWidth / 2, addrY + 4.5, { align: 'center' });
+                    doc.text('Plot No.91/A, D-Block, IDA Autonagar, Gajuwaka, Visakhapatnam-530 012', pageWidth / 2, addrY +
+                        9, { align: 'center' });
+                }
+
+                // ----- INTERNAL COPY -----
+                if (internal) {
+                    doc.addPage();
+                    let iy = margin;
+                    if (logoData) {
+                        const img = new Image();
+                        img.src = logoData;
+                        const aspect = img.width / img.height || 2;
+                        const w = 30;
+                        const h = 30 / aspect;
+                        doc.addImage(logoData, 'PNG', margin, iy - 2, w, h);
+                        iy += 4;
+                    }
+                    doc.setFontSize(16);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('INTERNAL COPY', pageWidth / 2, iy, { align: 'center' });
+                    iy += 10;
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Quotation: ' + qNum, margin, iy);
+                    iy += 6;
+                    doc.text('Generated: ' + new Date().toLocaleString('en-IN'), margin, iy);
+                    iy += 10;
+                    doc.text('Internal Notes:', margin, iy);
+                    iy += 5;
+                    doc.text('(This copy is for internal record keeping only.)', margin + 4, iy);
+                    iy += 8;
+                    doc.text('Prepared By: N. Ephraim', margin, iy);
+                    iy += 6;
+                    doc.text('Timestamp: ' + new Date().toISOString(), margin, iy);
+                    iy += 6;
+                    doc.text('Company: Muthyam Steel Private Limited', margin, iy);
+                    iy += 10;
+                    doc.text('--- Cost Breakdown ---', margin, iy);
+                    iy += 6;
+                    doc.text('Subtotal: ' + formatCurrencyPdf(subtotal), margin + 4, iy);
+                    iy += 5;
+                    doc.text('GST (18%): ' + formatCurrencyPdf(gst), margin + 4, iy);
+                    iy += 5;
+                    doc.text('Grand Total: ' + formatCurrencyPdf(grand), margin + 4, iy);
+                    iy += 10;
+                    doc.text('Total Items: ' + items.length, margin + 4, iy);
+                }
+
+                const filename = internal ? 'Internal_Copy_' + qNum + '.pdf' : 'Quotation_' + qNum + '.pdf';
+                doc.save(filename);
+                showToast('PDF generated: ' + filename, 'success');
+
+                if (!internal) {
+                    clearAllData();
+                    quoteDate.value = new Date().toISOString().split('T')[0];
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => clientName.focus(), 400);
+                    showToast('New quotation started. Ready for next entry.', 'success');
+                }
+            }
+
+            // ============================================================
+            // INPUT FORMATTING: Phone, GST, Email validation
+            // ============================================================
+            clientPhone.addEventListener('input', function(e) {
+                let val = this.value.replace(/\D/g, '');
+                if (val.length > 10) val = val.slice(0, 10);
+                let formatted = val;
+                if (val.length > 5) {
+                    formatted = val.slice(0, 5) + ' ' + val.slice(5);
+                }
+                this.value = formatted;
+            });
+
+            clientGst.addEventListener('input', function() {
+                let val = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (val.length > 15) val = val.slice(0, 15);
+                this.value = val;
+            });
+
+            clientEmail.addEventListener('blur', function() {
+                const email = this.value.trim();
+                if (email && !email.includes('@')) {
+                    showToast('Please enter a valid email address.', 'error');
+                }
+            });
+
+            // ============================================================
+            // EVENT BINDING
+            // ============================================================
+
+            // ---- Combobox ----
+            materialSearchInput.addEventListener('input', function() {
+                filterText = this.value;
+                selectedIndex = -1;
+                renderDropdown(filterText);
+                if (filterText.trim()) {
+                    positionDropdown();
+                } else {
+                    renderDropdown('');
+                    positionDropdown();
+                }
+            });
+
+            materialSearchInput.addEventListener('focus', function() {
+                filterText = this.value;
+                selectedIndex = -1;
+                renderDropdown(filterText);
+                positionDropdown();
+            });
+
+            materialSearchInput.addEventListener('keydown', function(e) {
+                const results = getFilteredResults();
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (results.length > 0) {
+                        selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+                        renderDropdown(filterText);
+                        positionDropdown();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (results.length > 0) {
+                        selectedIndex = Math.max(selectedIndex - 1, -1);
+                        renderDropdown(filterText);
+                        positionDropdown();
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && selectedIndex < results.length) {
+                        const m = results[selectedIndex];
+                        selectMaterial(m.name, m.kgPipe);
+                    } else if (results.length === 1) {
+                        const m = results[0];
+                        selectMaterial(m.name, m.kgPipe);
+                    }
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeDropdown();
+                    materialSearchInput.blur();
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                const wrapper = document.getElementById('materialCombobox');
+                const portal = document.getElementById('materialDropdownPortal');
+                if (!wrapper.contains(e.target) && !portal.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            dropdownPortal.addEventListener('click', function(e) {
+                const item = e.target.closest('.dropdown-item');
+                if (!item) return;
+                const name = item.dataset.name;
+                const kg = parseFloat(item.dataset.kg);
+                if (name) {
+                    selectMaterial(name, kg);
+                }
+            });
+
+            // ---- Add Item ----
+            addItemBtn.addEventListener('click', function() {
+                const val = materialSearchInput.value.trim();
+                if (!val) {
+                    showToast('Please search and select a material first.', 'error');
+                    return;
+                }
+                const exact = MATERIALS.find(m => m.name.toLowerCase() === val.toLowerCase());
+                if (exact) {
+                    selectMaterial(exact.name, exact.kgPipe);
+                } else {
+                    const partial = MATERIALS.find(m => m.name.toLowerCase().includes(val.toLowerCase()));
+                    if (partial) {
+                        selectMaterial(partial.name, partial.kgPipe);
+                    } else {
+                        showToast('No matching material found. Please select from dropdown.', 'error');
+                    }
+                }
+            });
+
+            // ---- Save Draft ----
+            saveDraftBtn.addEventListener('click', saveDraft);
+
+            // ---- New Quotation ----
+            newQuotationBtn.addEventListener('click', function() {
+                if (items.length === 0 && !clientName.value && !companyName.value) {
+                    showToast('Already a fresh quotation.', 'info');
+                    return;
+                }
+                confirmOverlay.classList.add('open');
+            });
+
+            confirmCancel.addEventListener('click', function() {
+                confirmOverlay.classList.remove('open');
+            });
+
+            confirmOk.addEventListener('click', function() {
+                confirmOverlay.classList.remove('open');
+                clearAllData();
+                quoteDate.value = new Date().toISOString().split('T')[0];
+                showToast('New quotation started.', 'success');
+                clientName.focus();
+            });
+
+            // ---- Generate Internal Copy ----
+            internalCopyBtn.addEventListener('click', function() {
+                generateClientPDF(true);
+            });
+
+            // ---- Generate Client PDF ----
+            clientPdfBtn.addEventListener('click', function() {
+                generateClientPDF(false);
+            });
+
+            // ---- Sticky PDF ----
+            stickyPdfBtn.addEventListener('click', function() {
+                const area = document.getElementById('actionArea');
+                area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    generateClientPDF(false);
+                }, 400);
+            });
+
+            confirmOverlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    confirmOverlay.classList.remove('open');
+                }
+            });
+
+            // ---- Set default date ----
+            if (!quoteDate.value) {
+                quoteDate.value = new Date().toISOString().split('T')[0];
+            }
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            const loaded = loadDraft();
+            if (!loaded) {
+                quoteDate.value = new Date().toISOString().split('T')[0];
+                updateQuoteNumberDisplay();
+                renderAll();
+            } else {
+                updateQuoteNumberDisplay();
+                renderAll();
+            }
+
+            if (items.length === 0) {
+                document.getElementById('stickyAction').style.display = 'none';
+            }
+
+            showToast('Quotation Manager ready.', 'info');
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+                    e.preventDefault();
+                    newQuotationBtn.click();
+                }
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveDraft();
+                }
+            });
+
+            console.log('Muthyam Steel Quotation Manager — Logo now works in PDF');
+        })();
+    </script>
+
+</body>
+</html>
