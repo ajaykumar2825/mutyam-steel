@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MS · Quotation</title>
     <!-- Favicon: simple text "MS" -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-weight='bold' fill='%231a3a5c'>MS</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='65' font-weight='bold' fill='%231a3a5c'>MS</text></svg>" />
 
     <!-- jsPDF + AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
@@ -56,6 +56,120 @@
             min-height: 100vh;
             padding: 24px 20px 120px 20px;
             background: #f1f4f8;
+            position: relative;
+        }
+
+        /* ============================================================
+           LOGIN OVERLAY
+           ============================================================ */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            transition: opacity 0.3s;
+        }
+        .login-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .login-box {
+            background: var(--white);
+            padding: 40px 44px;
+            border-radius: 12px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid var(--gray-200);
+        }
+        .login-box .logo-area {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-box .logo-area img {
+            height: 50px;
+            width: auto;
+            max-height: 60px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 8px;
+        }
+        .login-box .logo-area h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--steel);
+            letter-spacing: -0.3px;
+        }
+        .login-box .logo-area .sub {
+            font-size: 13px;
+            color: var(--gray-600);
+            font-weight: 400;
+        }
+        .login-box .form-group {
+            margin-bottom: 16px;
+        }
+        .login-box .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--gray-600);
+            display: block;
+            margin-bottom: 3px;
+        }
+        .login-box .form-group input {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: var(--font);
+            background: var(--white);
+            width: 100%;
+            color: var(--gray-800);
+            transition: border 0.15s;
+        }
+        .login-box .form-group input:focus {
+            outline: none;
+            border-color: var(--steel-light);
+            box-shadow: 0 0 0 3px rgba(26, 75, 109, 0.10);
+        }
+        .login-box .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--steel);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 15px;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 6px;
+        }
+        .login-box .btn-login:hover {
+            background: var(--steel-light);
+        }
+        .login-box .login-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        /* ============================================================
+           APP CONTAINER (hidden until login)
+           ============================================================ */
+        .app-container-wrapper {
+            display: none;
+        }
+        .app-container-wrapper.active {
+            display: block;
         }
 
         .app-container {
@@ -69,7 +183,7 @@
         }
 
         /* ============================================================
-           HEADER with Logo
+           HEADER — only logo, no company name
            ============================================================ */
         .company-header {
             display: flex;
@@ -85,34 +199,44 @@
         .company-header .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0; /* remove gap, only logo */
         }
 
         .company-header .brand img {
-            height: 44px;
+            height: 50px;
             width: auto;
-            max-height: 50px;
+            max-height: 60px;
             object-fit: contain;
         }
 
-        .company-header .brand .text-group {
+        .header-right {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .company-header .brand .text-group h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            color: var(--steel);
-            line-height: 1.2;
-        }
-
-        .company-header .brand .text-group .sub {
+        .header-right .user-badge {
             font-size: 13px;
             color: var(--gray-600);
-            font-weight: 400;
-            letter-spacing: 0.2px;
+        }
+        .header-right .user-badge strong {
+            color: var(--steel);
+        }
+        .header-right .btn-logout {
+            background: none;
+            border: 1px solid var(--gray-300);
+            padding: 4px 16px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-family: var(--font);
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: background 0.15s, color 0.15s;
+        }
+        .header-right .btn-logout:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
         }
 
         .header-badge {
@@ -135,7 +259,7 @@
         }
 
         /* ============================================================
-           FORM GRID
+           FORM GRID (unchanged)
            ============================================================ */
         .form-grid {
             display: grid;
@@ -282,7 +406,7 @@
         }
 
         /* ============================================================
-           ITEMS TABLE
+           ITEMS TABLE (unchanged)
            ============================================================ */
         .items-section {
             margin-top: 8px;
@@ -839,6 +963,11 @@
             }
             .company-header .brand {
                 width: 100%;
+                justify-content: center; /* center logo on mobile */
+            }
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
             }
             .company-header .header-badge {
                 text-align: left;
@@ -905,8 +1034,8 @@
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            .company-header .brand .text-group h1 {
-                font-size: 20px;
+            .company-header .brand img {
+                height: 40px;
             }
             .header-badge .quotation-number {
                 font-size: 17px;
@@ -934,6 +1063,10 @@
             .toast {
                 padding: 10px 14px;
                 font-size: 13px;
+            }
+            .login-box {
+                padding: 28px 20px;
+                margin: 0 16px;
             }
         }
 
@@ -1040,9 +1173,57 @@
         .gst-input {
             text-transform: uppercase;
         }
+
+        /* ============================================================
+           LOGIN PAGE LOGO (if no logo in assets)
+           ============================================================ */
+        .login-logo-placeholder {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--steel);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .login-logo-placeholder span {
+            font-weight: 300;
+            color: var(--gray-400);
+        }
     </style>
 </head>
 <body>
+
+    <!-- ============================================================
+    LOGIN OVERLAY
+    ============================================================ -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="logo-area">
+                <img id="loginLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
+                     style="display:none; height:50px; width:auto; max-height:60px; object-fit:contain; margin:0 auto 8px;"
+                     onerror="this.style.display='none'; document.getElementById('loginLogoPlaceholder').style.display='block';" />
+                <div id="loginLogoPlaceholder" style="display:none;" class="login-logo-placeholder">MS<span>.</span></div>
+                <h2>Mutyam Steel</h2>
+                <div class="sub">Quotation Manager</div>
+            </div>
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="loginName">Your Name</label>
+                    <input type="text" id="loginName" placeholder="e.g. N. Ephraim" required />
+                </div>
+                <div class="form-group">
+                    <label for="loginPhone">Phone</label>
+                    <input type="tel" id="loginPhone" placeholder="98765 43210" maxlength="11" required />
+                </div>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" required />
+                </div>
+                <button type="submit" class="btn-login">Access Quotation System</button>
+                <div class="login-error" id="loginError">Please fill in all fields correctly.</div>
+            </form>
+        </div>
+    </div>
 
     <!-- ============================================================
     CONFIRM OVERLAY
@@ -1064,142 +1245,145 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ============================================================
-    APP
+    APP CONTAINER (hidden until login)
     ============================================================ -->
-    <div class="app-container" id="app">
+    <div class="app-container-wrapper" id="appWrapper">
 
-        <!-- HEADER with Logo -->
-        <div class="company-header">
-            <div class="brand">
-                <!-- Logo image: will show if exists, otherwise hidden via onerror -->
-                <img id="headerLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
-                     style="display:none; height:44px; width:auto; max-height:50px; object-fit:contain;"
-                     onerror="this.style.display='none'" 
-                     onload="this.style.display='inline-block'" />
-                <div class="text-group">
-                    <h1>Muthyam Steel Private Limited</h1>
-                    <div class="sub">Steel · Structural · Engineering</div>
+        <div class="app-container" id="app">
+
+            <!-- HEADER — only logo, no company name -->
+            <div class="company-header">
+                <div class="brand">
+                    <img id="headerLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
+                         style="display:none; height:50px; width:auto; max-height:60px; object-fit:contain;"
+                         onerror="this.style.display='none'" 
+                         onload="this.style.display='inline-block'" />
                 </div>
-            </div>
-            <div class="header-badge">
-                <div class="quotation-label">Quotation</div>
-                <div class="quotation-number" id="quotationNumberDisplay">MSPL/TS/2025-26/001</div>
-            </div>
-        </div>
-
-        <!-- CLIENT INFORMATION -->
-        <div class="form-grid" id="clientSection">
-            <div class="form-group">
-                <label for="quoteDate">Date</label>
-                <input type="date" id="quoteDate" />
-            </div>
-            <div class="form-group">
-                <label for="clientName">Client Name</label>
-                <input type="text" id="clientName" placeholder="e.g. ABC Constructions" />
-            </div>
-            <div class="form-group">
-                <label for="companyName">Company Name</label>
-                <input type="text" id="companyName" placeholder="e.g. ABC Constructions Pvt Ltd" />
-            </div>
-            <div class="form-group">
-                <label for="clientPhone">Phone</label>
-                <div style="display:flex; align-items:center; gap:4px; border:1px solid var(--gray-300); border-radius:var(--radius); background:var(--white); padding:0 8px;">
-                    <span style="font-weight:600; color:var(--gray-600); font-size:14px;">+91</span>
-                    <input type="tel" id="clientPhone" class="phone-input" placeholder="98765 43210" maxlength="11" style="border:none; padding:8px 0; width:100%; background:transparent; font-size:14px; outline:none;" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="clientEmail">Email</label>
-                <input type="email" id="clientEmail" placeholder="client@example.com" />
-            </div>
-            <div class="form-group">
-                <label for="deliveryAddress">Delivery Address</label>
-                <input type="text" id="deliveryAddress" placeholder="Site address" />
-            </div>
-            <div class="form-group">
-                <label for="clientGst">GST Number</label>
-                <input type="text" id="clientGst" class="gst-input" placeholder="e.g. 36AACCN7242C1ZQ" maxlength="15" />
-            </div>
-            <div class="form-group">
-                <label for="clientState">State Code</label>
-                <input type="text" id="clientState" placeholder="e.g. 36" maxlength="2" />
-            </div>
-            <div class="form-group" style="grid-column: span 2;">
-                <label for="remarks">Remarks</label>
-                <textarea id="remarks" rows="1" placeholder="Any special instructions or notes"></textarea>
-            </div>
-        </div>
-
-        <!-- ITEMS SECTION -->
-        <div class="items-section">
-            <div class="section-title">Materials</div>
-
-            <!-- Desktop Table -->
-            <div class="table-responsive">
-                <table class="items-table" id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th class="col-sno">S.No</th>
-                            <th class="col-material">Item</th>
-                            <th class="col-kgpipe">Weight / Pipe</th>
-                            <th class="col-qty">Quantity</th>
-                            <th class="col-unit">Unit</th>
-                            <th class="col-price">Price</th>
-                            <th class="col-price-unit">Price Unit</th>
-                            <th class="col-total">Total Amount</th>
-                            <th class="col-remarks">Remarks</th>
-                            <th class="col-delete"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="itemsTableBody">
-                        <!-- rows inserted by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Mobile Card List -->
-            <div class="mobile-card-list" id="mobileCardList">
-                <!-- cards inserted by JS -->
-            </div>
-
-            <!-- Add Row -->
-            <div class="add-item-row">
-                <div style="flex:1;min-width:180px;">
-                    <div class="combobox-wrapper" id="materialCombobox">
-                        <input type="text" class="combobox-input" id="materialSearchInput"
-                        placeholder="Search material…" autocomplete="off" />
+                <div class="header-right">
+                    <span class="user-badge">Welcome, <strong id="headerUserName">User</strong></span>
+                    <button class="btn-logout" id="logoutBtn">Logout</button>
+                    <div class="header-badge">
+                        <div class="quotation-label">Quotation</div>
+                        <div class="quotation-number" id="quotationNumberDisplay">MSPL/TS/2025-26/001</div>
                     </div>
                 </div>
-                <button class="add-btn" id="addItemBtn">+ Add Item</button>
             </div>
-        </div>
 
-        <!-- SUMMARY -->
-        <div class="summary-section">
-            <div class="summary-grid">
-                <div class="summary-row">
-                    <span class="label">Subtotal</span>
-                    <span class="value" id="subtotalDisplay">₹ 0.00</span>
+            <!-- CLIENT INFORMATION -->
+            <div class="form-grid" id="clientSection">
+                <div class="form-group">
+                    <label for="quoteDate">Date</label>
+                    <input type="date" id="quoteDate" />
                 </div>
-                <div class="summary-row gst">
-                    <span class="label">GST (18%)</span>
-                    <span class="value" id="gstDisplay">₹ 0.00</span>
+                <div class="form-group">
+                    <label for="clientName">Client Name</label>
+                    <input type="text" id="clientName" placeholder="e.g. ABC Constructions" />
                 </div>
-                <div class="summary-row total">
-                    <span class="label">Grand Total</span>
-                    <span class="value" id="grandTotalDisplay">₹ 0.00</span>
+                <div class="form-group">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" placeholder="e.g. ABC Constructions Pvt Ltd" />
+                </div>
+                <div class="form-group">
+                    <label for="clientPhone">Phone</label>
+                    <div style="display:flex; align-items:center; gap:4px; border:1px solid var(--gray-300); border-radius:var(--radius); background:var(--white); padding:0 8px;">
+                        <span style="font-weight:600; color:var(--gray-600); font-size:14px;">+91</span>
+                        <input type="tel" id="clientPhone" class="phone-input" placeholder="98765 43210" maxlength="11" style="border:none; padding:8px 0; width:100%; background:transparent; font-size:14px; outline:none;" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientEmail">Email</label>
+                    <input type="email" id="clientEmail" placeholder="client@example.com" />
+                </div>
+                <div class="form-group">
+                    <label for="deliveryAddress">Delivery Address</label>
+                    <input type="text" id="deliveryAddress" placeholder="Site address" />
+                </div>
+                <div class="form-group">
+                    <label for="clientGst">GST Number</label>
+                    <input type="text" id="clientGst" class="gst-input" placeholder="e.g. 36AACCN7242C1ZQ" maxlength="15" />
+                </div>
+                <div class="form-group">
+                    <label for="clientState">State Code</label>
+                    <input type="text" id="clientState" placeholder="e.g. 36" maxlength="2" />
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" rows="1" placeholder="Any special instructions or notes"></textarea>
                 </div>
             </div>
-        </div>
 
-        <!-- ACTIONS -->
-        <div class="actions-area" id="actionArea">
-            <button class="btn btn-secondary" id="saveDraftBtn">Save Draft</button>
-            <button class="btn btn-outline" id="newQuotationBtn">New Quotation</button>
-            <button class="btn btn-secondary" id="internalCopyBtn">Generate Internal Copy</button>
-            <button class="btn btn-client-pdf" id="clientPdfBtn">Generate Client PDF</button>
-        </div>
+            <!-- ITEMS SECTION -->
+            <div class="items-section">
+                <div class="section-title">Materials</div>
 
+                <!-- Desktop Table -->
+                <div class="table-responsive">
+                    <table class="items-table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th class="col-sno">S.No</th>
+                                <th class="col-material">Item</th>
+                                <th class="col-kgpipe">Weight / Pipe</th>
+                                <th class="col-qty">Quantity</th>
+                                <th class="col-unit">Unit</th>
+                                <th class="col-price">Price</th>
+                                <th class="col-price-unit">Price Unit</th>
+                                <th class="col-total">Total Amount</th>
+                                <th class="col-remarks">Remarks</th>
+                                <th class="col-delete"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <!-- rows inserted by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Card List -->
+                <div class="mobile-card-list" id="mobileCardList">
+                    <!-- cards inserted by JS -->
+                </div>
+
+                <!-- Add Row -->
+                <div class="add-item-row">
+                    <div style="flex:1;min-width:180px;">
+                        <div class="combobox-wrapper" id="materialCombobox">
+                            <input type="text" class="combobox-input" id="materialSearchInput"
+                            placeholder="Search material…" autocomplete="off" />
+                        </div>
+                    </div>
+                    <button class="add-btn" id="addItemBtn">+ Add Item</button>
+                </div>
+            </div>
+
+            <!-- SUMMARY -->
+            <div class="summary-section">
+                <div class="summary-grid">
+                    <div class="summary-row">
+                        <span class="label">Subtotal</span>
+                        <span class="value" id="subtotalDisplay">₹ 0.00</span>
+                    </div>
+                    <div class="summary-row gst">
+                        <span class="label">GST (18%)</span>
+                        <span class="value" id="gstDisplay">₹ 0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span class="label">Grand Total</span>
+                        <span class="value" id="grandTotalDisplay">₹ 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="actions-area" id="actionArea">
+                <button class="btn btn-secondary" id="saveDraftBtn">Save Draft</button>
+                <button class="btn btn-outline" id="newQuotationBtn">New Quotation</button>
+                <button class="btn btn-secondary" id="internalCopyBtn">Generate Internal Copy</button>
+                <button class="btn btn-client-pdf" id="clientPdfBtn">Generate Client PDF</button>
+            </div>
+
+        </div>
     </div>
 
     <!-- ============================================================
@@ -1220,6 +1404,108 @@
     <script>
         (function() {
             'use strict';
+
+            // ============================================================
+            // LOGIN HANDLING
+            // ============================================================
+            const loginOverlay = document.getElementById('loginOverlay');
+            const loginForm = document.getElementById('loginForm');
+            const loginName = document.getElementById('loginName');
+            const loginPhone = document.getElementById('loginPhone');
+            const loginEmail = document.getElementById('loginEmail');
+            const loginError = document.getElementById('loginError');
+            const appWrapper = document.getElementById('appWrapper');
+            const headerUserName = document.getElementById('headerUserName');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            const USER_STORAGE_KEY = 'muthyam_quotation_user';
+
+            function getUserData() {
+                try {
+                    const raw = localStorage.getItem(USER_STORAGE_KEY);
+                    if (!raw) return null;
+                    return JSON.parse(raw);
+                } catch { return null; }
+            }
+
+            function saveUserData(name, phone, email) {
+                const data = { name, phone, email };
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data));
+                return data;
+            }
+
+            function clearUserData() {
+                localStorage.removeItem(USER_STORAGE_KEY);
+            }
+
+            function loginUser(name, phone, email) {
+                const data = saveUserData(name, phone, email);
+                headerUserName.textContent = data.name;
+                loginOverlay.classList.add('hidden');
+                appWrapper.classList.add('active');
+                // re-init app (load draft, etc.)
+                initApp();
+                showToast('Welcome, ' + data.name + '!', 'success');
+            }
+
+            function logoutUser() {
+                clearUserData();
+                loginOverlay.classList.remove('hidden');
+                appWrapper.classList.remove('active');
+                // reset login form
+                loginName.value = '';
+                loginPhone.value = '';
+                loginEmail.value = '';
+                loginError.style.display = 'none';
+                // hide sticky action
+                document.getElementById('stickyAction').style.display = 'none';
+            }
+
+            // Check if user already logged in
+            const existingUser = getUserData();
+            if (existingUser) {
+                headerUserName.textContent = existingUser.name;
+                loginOverlay.classList.add('hidden');
+                appWrapper.classList.add('active');
+                // delay init until DOM ready
+            } else {
+                loginOverlay.classList.remove('hidden');
+                appWrapper.classList.remove('active');
+            }
+
+            // Login form submit
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = loginName.value.trim();
+                const phone = loginPhone.value.replace(/\D/g, '').trim();
+                const email = loginEmail.value.trim();
+
+                if (!name || name.length < 2) {
+                    loginError.textContent = 'Please enter your full name.';
+                    loginError.style.display = 'block';
+                    return;
+                }
+                if (!phone || phone.length < 10) {
+                    loginError.textContent = 'Please enter a valid phone number (10-11 digits).';
+                    loginError.style.display = 'block';
+                    return;
+                }
+                if (!email || !email.includes('@')) {
+                    loginError.textContent = 'Please enter a valid email address.';
+                    loginError.style.display = 'block';
+                    return;
+                }
+
+                loginError.style.display = 'none';
+                loginUser(name, phone, email);
+            });
+
+            // Logout
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    logoutUser();
+                }
+            });
 
             // ============================================================
             // MATERIAL DATA
@@ -1522,9 +1808,13 @@
 
             function parseNumber(v) {
                 if (v === '' || v === null || v === undefined) return 0;
+                if (typeof v === 'string') {
+                    v = v.replace(/[^0-9.\-]/g, '');
+                }
                 const n = parseFloat(v);
-                return isNaN(n) ? 0 : n;
+                return Number.isFinite(n) ? n : 0;
             }
+
 
             function generateQuoteNumber() {
                 const year = new Date().getFullYear();
@@ -1604,6 +1894,17 @@
                 dropdownPortal.style.width = Math.max(rect.width, 280) + 'px';
             }
 
+            window.addEventListener('scroll', function() {
+                if (!dropdownOpen) return;
+                positionDropdown();
+            }, { passive: true });
+
+            window.addEventListener('resize', function() {
+                if (!dropdownOpen) return;
+                positionDropdown();
+            });
+
+
             function closeDropdown() {
                 dropdownPortal.classList.remove('open');
                 dropdownOpen = false;
@@ -1626,6 +1927,7 @@
             // ITEMS CRUD
             // ============================================================
             function addItem(material, kgPipe, price, priceUnit, qty, qtyUnit) {
+
                 const id = nextId++;
                 const item = {
                     id,
@@ -2036,13 +2338,40 @@
             }
 
             // ============================================================
-            // PDF GENERATION — Professional with logo
+            // PDF GENERATION — fixed page numbering with total pages
             // ============================================================
             async function generateClientPDF(internal) {
+                // Validate required fields
+                const name = (clientName.value || '').trim();
+                const comp = (companyName.value || '').trim();
+                const phone = (clientPhone.value || '').replace(/\D/g, '').trim();
+                const phoneDigits = phone.slice(0, 11);
+
+                if (!name) {
+                    showToast('Client Name is required.', 'error');
+                    return;
+                }
+                if (!comp) {
+                    showToast('Company Name is required.', 'error');
+                    return;
+                }
+                if (!phoneDigits || phoneDigits.length < 10) {
+                    showToast('Client Phone (10-11 digits) is required.', 'error');
+                    return;
+                }
+                // Normalize phone (store only digits)
+                clientPhone.value = phoneDigits;
+
                 if (items.length === 0) {
                     showToast('Add at least one material item before generating PDF.', 'error');
                     return;
                 }
+
+                // Get logged-in user data
+                const userData = getUserData();
+                const userName = userData ? userData.name : 'N. Ephraim';
+                const userPhone = userData ? userData.phone : '';
+                const userEmail = userData ? userData.email : '';
 
                 const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
                 const pageWidth = 210;
@@ -2052,89 +2381,114 @@
                 // Load logo
                 const logoData = await loadLogoAsBase64();
 
-                // ----- HEADER with Logo -----
+                // ----- HEADER: only logo, centered, with good spacing -----
+                let headerY = y;
                 if (logoData) {
                     const img = new Image();
                     img.src = logoData;
                     const aspect = img.width / img.height || 2;
-                    const w = 30;
-                    const h = 30 / aspect;
-                    doc.addImage(logoData, 'PNG', margin, y - 2, w, h);
-                    y += 4;
+                    const w = 150;
+                    const h = w / aspect;
+                    const x = (pageWidth - w) / 2;
+                    doc.addImage(logoData, 'PNG', x, headerY, w, h);
+                    headerY += h + 8;
+                } else {
+                    headerY += 8;
                 }
 
-                doc.setFontSize(20);
+                // Document title
                 doc.setFont('helvetica', 'bold');
-                doc.text('MUTHYAM STEEL PRIVATE LIMITED', pageWidth / 2, y, { align: 'center' });
-                y += 7;
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text('Steel · Structural · Engineering', pageWidth / 2, y, { align: 'center' });
-                y += 4;
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'italic');
-                doc.text('Business Development Partner for TATA STRUCTURA', pageWidth / 2, y, { align: 'center' });
-                y += 10;
+                doc.setFontSize(13);
+                doc.text('PROFORMA INVOICE', pageWidth / 2, headerY, { align: 'center' });
+                headerY += 8;
 
-                doc.setFontSize(11);
-                doc.setFont('helvetica', 'bold');
-                doc.text('PROFORMA - INVOICE', pageWidth / 2, y, { align: 'center' });
-                y += 8;
+                y = headerY;
 
-                // ----- TWO-COLUMN DETAILS -----
-                doc.setFontSize(8.5);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Customer Details :', margin, y);
-                y += 5;
-
-                const leftX = margin;
-                const rightX = margin + 100;
-
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-
-                let leftLines = [];
-                if (clientName.value) leftLines.push(['Name', clientName.value]);
-                if (companyName.value) leftLines.push(['Company', companyName.value]);
-                if (deliveryAddress.value) leftLines.push(['Address', deliveryAddress.value]);
-                if (clientPhone.value) leftLines.push(['Ph. No.', '+91 ' + clientPhone.value]);
-                if (clientEmail.value) leftLines.push(['Email Id', clientEmail.value]);
-                if (clientGst.value) leftLines.push(['GST No.', clientGst.value]);
-                if (clientState.value) leftLines.push(['State Code', clientState.value]);
-
-                const qNum = generateQuoteNumber();
+                // ----- CUSTOMER + QUOTATION details -----
+                const now = new Date();
                 const dateStr = quoteDate.value ? new Date(quoteDate.value).toLocaleDateString('en-IN', { day: '2-digit',
                     month: 'short', year: 'numeric' }) : 'Not set';
-                let rightLines = [
-                    ['Date', dateStr],
+                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const dateTimeStr = dateStr + ' ' + timeStr;
+
+                const qNum = generateQuoteNumber();
+
+                const leftTable = [
+                    ['Name', (clientName.value || '').trim() || '-'],
+                    ['Company', (companyName.value || '').trim() || '-'],
+                    ['Address', (deliveryAddress.value || '').trim() || '-'],
+                    ['Ph. No.', (clientPhone.value ? '+91 ' + clientPhone.value : '').trim() || '-'],
+                    ['Email Id', (clientEmail.value || '').trim() || '-'],
+                    ['GST No.', (clientGst.value || '').trim() || '-'],
+                    ['State Code', (clientState.value || '').trim() || '-']
+                ];
+
+                const rightTable = [
+                    ['Date', dateTimeStr],
                     ['Quotation No.', qNum],
                     ['GST.No: Telangana', '36AACCN7242C1ZQ'],
                     ['GST.No: Andhra Pradesh', '37AACCN7242C1ZO'],
                     ['H.S.N Code (CHS)', '7306.30.90'],
                     ['H.S.N Code (RHS & SHS)', '7306.61.00'],
                     ['Grade', 'IS 1161_CHS / IS 4923_RHS & SHS'],
-                    ['Contact Person', clientName.value || 'Mr'],
-                    ['Contact No.', clientPhone.value ? '+91 ' + clientPhone.value : ''],
-                    ['Mail Id', clientEmail.value || '']
+                    ['Contact Person', userName],
+                    ['Contact No.', userPhone ? '+91 ' + userPhone : '-'],
+                    ['Mail Id', userEmail || '-']
                 ];
 
-                let lx = leftX;
-                let ly = y;
-                for (const line of leftLines) {
-                    doc.text(line[0] + ' :', lx, ly);
-                    doc.text(line[1] || '-', lx + 40, ly);
-                    ly += 5;
-                }
+                const detailsStartY = y + 2;
+                const gapBetweenBoxes = 6;
+                const detailsBoxWidth = (pageWidth - margin * 2 - gapBetweenBoxes) / 2;
+                const labelColW = 30;
+                const valueColW = detailsBoxWidth - labelColW - 2;
 
-                let rx = rightX;
-                let ry = y;
-                for (const line of rightLines) {
-                    doc.text(line[0] + ' :', rx, ry);
-                    doc.text(line[1] || '-', rx + 55, ry);
-                    ry += 5;
-                }
+                const leftBoxX = margin;
+                const rightBoxX = margin + detailsBoxWidth + gapBetweenBoxes;
 
-                y = Math.max(ly, ry) + 4;
+                const tableOptionsCommon = {
+                    startY: detailsStartY,
+                    theme: 'plain',
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 1.8,
+                        font: 'helvetica',
+                        overflow: 'linebreak',
+                        valign: 'top',
+                        cellWidth: 'wrap'
+                    },
+                    head: [],
+                    showHead: false,
+                    margin: { left: 0, right: 0 },
+                    horizontalPageBreak: false,
+                    tableLineColor: [200, 200, 200],
+                    tableLineWidth: 0.15
+                };
+
+                doc.autoTable({
+                    ...tableOptionsCommon,
+                    body: leftTable,
+                    margin: { left: leftBoxX, right: margin },
+                    tableWidth: detailsBoxWidth,
+                    columnStyles: {
+                        0: { cellWidth: labelColW, fontStyle: 'bold' },
+                        1: { cellWidth: valueColW }
+                    }
+                });
+
+                const leftFinalY = doc.lastAutoTable.finalY;
+
+                doc.autoTable({
+                    ...tableOptionsCommon,
+                    body: rightTable,
+                    margin: { left: rightBoxX, right: margin },
+                    tableWidth: detailsBoxWidth,
+                    columnStyles: {
+                        0: { cellWidth: labelColW + 6, fontStyle: 'bold' },
+                        1: { cellWidth: valueColW - 6 }
+                    }
+                });
+
+                y = Math.max(leftFinalY, doc.lastAutoTable.finalY) + 6;
 
                 // ----- MATERIAL TABLE -----
                 const tableData = items.map((it, idx) => {
@@ -2182,17 +2536,7 @@
                         7: { cellWidth: 'auto' },
                     },
                     margin: { left: margin, right: margin },
-                    didDrawPage: function(data) {
-                        const pageCount = doc.internal.getNumberOfPages();
-                        const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
-                        doc.setFontSize(7);
-                        doc.setFont('helvetica', 'italic');
-                        doc.text('Page ' + currentPage + ' of ' + pageCount, pageWidth - margin, 285, { align: 'right' });
-                        doc.text('Muthyam Steel Private Limited', margin, 285);
-                        const now = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit' });
-                        doc.text('Generated: ' + now, pageWidth - margin, 278, { align: 'right' });
-                    }
+                    // We will add page numbers after table generation
                 });
 
                 const finalY = doc.lastAutoTable.finalY + 10;
@@ -2224,11 +2568,15 @@
                 doc.text('Grand Total', boxX + 6, sy);
                 doc.text(formatCurrencyPdf(grand), boxX + boxWidth - 6, sy, { align: 'right' });
 
-                // ----- TERMS & CONDITIONS (with new page if needed) -----
+                // ----- TERMS & CONDITIONS -----
+                const validityDate = new Date();
+                validityDate.setDate(validityDate.getDate() + 3);
+                const validityStr = validityDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
                 const terms = [
                     '1. GST @ 18% Included on the above price',
                     '2. Test Certificates will send as per the requirement.',
-                    '3. Offer Validity up to 00/00/2025',
+                    `3. Offer Validity up to ${validityStr}`,
                     '4. Tolerance +/- 0.5% variation in quantity to be acceptable.',
                     '5. Available sections : Lead time of despatch : 1-3 working Days',
                     '6. Non available sections : Lead time of despatch : 3-4 weeks',
@@ -2264,23 +2612,6 @@
                 doc.text('Company: Muthyam Steel Private Limited', margin, sigY + 5);
                 doc.text('Authorized Signature: _________________________', margin, sigY + 12);
 
-                // ----- FOOTER (only on last page) -----
-                const totalPages = doc.internal.getNumberOfPages();
-                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
-                if (currentPage === totalPages) {
-                    const addrY = 272;
-                    doc.setFontSize(6);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(
-                        'HO : 209, Gowra Fountainhead Patrika Nagar, Madhapur, Hyderabad - 500081 | Regd. Office: Plot No.49, New Maruthi Nagar, Kharmanghat, Hyderabad, 500079',
-                        pageWidth / 2, addrY, { align: 'center' });
-                    doc.text(
-                        'Depot: Sy.No.31/A/AA(PART), Hameedullah Village & Grampanchayat, Shamshabad Mandal, RangaReddy Dist-501218 | AP Branch: D.No.76-18-70, Temple Street, Iron Complex, Bhavanipuram, Vijayawada-520012',
-                        pageWidth / 2, addrY + 4.5, { align: 'center' });
-                    doc.text('Plot No.91/A, D-Block, IDA Autonagar, Gajuwaka, Visakhapatnam-530 012', pageWidth / 2, addrY +
-                        9, { align: 'center' });
-                }
-
                 // ----- INTERNAL COPY -----
                 if (internal) {
                     doc.addPage();
@@ -2289,10 +2620,11 @@
                         const img = new Image();
                         img.src = logoData;
                         const aspect = img.width / img.height || 2;
-                        const w = 30;
-                        const h = 30 / aspect;
-                        doc.addImage(logoData, 'PNG', margin, iy - 2, w, h);
-                        iy += 4;
+                        const w = 18;
+                        const h = w / aspect;
+                        const x = (pageWidth - w) / 2;
+                        doc.addImage(logoData, 'PNG', x, iy, w, h);
+                        iy += h + 6;
                     }
                     doc.setFontSize(16);
                     doc.setFont('helvetica', 'bold');
@@ -2325,6 +2657,16 @@
                     doc.text('Total Items: ' + items.length, margin + 4, iy);
                 }
 
+                // ----- ADD PAGE NUMBERS (x of n) on ALL pages -----
+                const totalPages = doc.internal.getNumberOfPages();
+                const footerY = 285; // from bottom
+                for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(7);
+                    doc.setFont('helvetica', 'italic');
+                    doc.text('Page ' + i + ' of ' + totalPages, pageWidth - margin, footerY, { align: 'right' });
+                }
+
                 const filename = internal ? 'Internal_Copy_' + qNum + '.pdf' : 'Quotation_' + qNum + '.pdf';
                 doc.save(filename);
                 showToast('PDF generated: ' + filename, 'success');
@@ -2339,11 +2681,11 @@
             }
 
             // ============================================================
-            // INPUT FORMATTING: Phone, GST, Email validation
+            // INPUT FORMATTING
             // ============================================================
             clientPhone.addEventListener('input', function(e) {
                 let val = this.value.replace(/\D/g, '');
-                if (val.length > 10) val = val.slice(0, 10);
+                if (val.length > 11) val = val.slice(0, 11);
                 let formatted = val;
                 if (val.length > 5) {
                     formatted = val.slice(0, 5) + ' ' + val.slice(5);
@@ -2513,23 +2855,34 @@
             }
 
             // ============================================================
-            // INIT
+            // INIT APP (called after login or on load)
             // ============================================================
-            const loaded = loadDraft();
-            if (!loaded) {
-                quoteDate.value = new Date().toISOString().split('T')[0];
-                updateQuoteNumberDisplay();
-                renderAll();
-            } else {
-                updateQuoteNumberDisplay();
-                renderAll();
+            function initApp() {
+                const loaded = loadDraft();
+                if (!loaded) {
+                    quoteDate.value = new Date().toISOString().split('T')[0];
+                    updateQuoteNumberDisplay();
+                    renderAll();
+                } else {
+                    updateQuoteNumberDisplay();
+                    renderAll();
+                }
+
+                if (items.length === 0) {
+                    document.getElementById('stickyAction').style.display = 'none';
+                }
+
+                // Only show toast if not already shown
+                if (!window._appInitialized) {
+                    showToast('Quotation Manager ready.', 'info');
+                    window._appInitialized = true;
+                }
             }
 
-            if (items.length === 0) {
-                document.getElementById('stickyAction').style.display = 'none';
+            // If user already logged in, init immediately
+            if (existingUser) {
+                initApp();
             }
-
-            showToast('Quotation Manager ready.', 'info');
 
             // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -2543,7 +2896,7 @@
                 }
             });
 
-            console.log('Muthyam Steel Quotation Manager — Logo now works in PDF');
+            console.log('Muthyam Steel Quotation Manager — page numbering fixed');
         })();
     </script>
 
