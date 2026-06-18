@@ -1199,7 +1199,7 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="logo-area">
-                <img id="loginLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
+                <img id="loginLogo" src="./assets/logo.png" alt="Mutyam Steel Logo" 
                      style="display:none; height:50px; width:auto; max-height:60px; object-fit:contain; margin:0 auto 8px;"
                      onerror="this.style.display='none'; document.getElementById('loginLogoPlaceholder').style.display='block';" />
                 <div id="loginLogoPlaceholder" style="display:none;" class="login-logo-placeholder">MS<span>.</span></div>
@@ -1254,7 +1254,7 @@
             <!-- HEADER — only logo, no company name -->
             <div class="company-header">
                 <div class="brand">
-                    <img id="headerLogo" src="./assets/logo.png" alt="Muthyam Steel Logo" 
+                    <img id="headerLogo" src="./assets/logo.png" alt="Mutyam Steel Logo" 
                          style="display:none; height:50px; width:auto; max-height:60px; object-fit:contain;"
                          onerror="this.style.display='none'" 
                          onload="this.style.display='inline-block'" />
@@ -1418,7 +1418,7 @@
             const headerUserName = document.getElementById('headerUserName');
             const logoutBtn = document.getElementById('logoutBtn');
 
-            const USER_STORAGE_KEY = 'muthyam_quotation_user';
+            const USER_STORAGE_KEY = 'Mutyam_quotation_user';
 
             function getUserData() {
                 try {
@@ -1760,7 +1760,7 @@
             let items = [];
             let nextId = 1;
             let quoteNumberCounter = 1;
-            const STORAGE_KEY = 'muthyam_quotation_draft';
+            const STORAGE_KEY = 'Mutyam_quotation_draft';
 
             // DOM refs
             const $ = id => document.getElementById(id);
@@ -2609,7 +2609,7 @@
 
                 const sigY = ty + 6;
                 doc.text('Prepared By: N. Ephraim', margin, sigY);
-                doc.text('Company: Muthyam Steel Private Limited', margin, sigY + 5);
+                doc.text('Company: Mutyam Steel Private Limited', margin, sigY + 5);
                 doc.text('Authorized Signature: _________________________', margin, sigY + 12);
 
                 // ----- INTERNAL COPY -----
@@ -2644,7 +2644,7 @@
                     iy += 6;
                     doc.text('Timestamp: ' + new Date().toISOString(), margin, iy);
                     iy += 6;
-                    doc.text('Company: Muthyam Steel Private Limited', margin, iy);
+                    doc.text('Company: Mutyam Steel Private Limited', margin, iy);
                     iy += 10;
                     doc.text('--- Cost Breakdown ---', margin, iy);
                     iy += 6;
@@ -2896,7 +2896,7 @@
                 }
             });
 
-            console.log('Muthyam Steel Quotation Manager — page numbering fixed');
+            console.log('Mutyam Steel Quotation Manager — page numbering fixed');
         })();
     </script>
 
