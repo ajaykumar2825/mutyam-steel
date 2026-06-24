@@ -2386,7 +2386,7 @@
                 if (logoData) {
                     const img = new Image();
                     img.src = logoData;
-                    const aspect = img.width / img.height || 2;
+                    const aspect = img.naturalWidth / img.naturalHeight || 2;
                     const w = 150;
                     const h = w / aspect;
                     const x = (pageWidth - w) / 2;
@@ -2619,7 +2619,7 @@
                     if (logoData) {
                         const img = new Image();
                         img.src = logoData;
-                        const aspect = img.width / img.height || 2;
+                        const aspect = img.naturalWidth / img.naturalHeight || 2;
                         const w = 18;
                         const h = w / aspect;
                         const x = (pageWidth - w) / 2;
