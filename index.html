@@ -2294,24 +2294,26 @@
             }
 
             // ============================================================
-            // LOGO LOADER - uses the already-loaded DOM image for reliability
+            // LOGO LOADER - loads any image as base64
             // ============================================================
-            function loadLogoAsBase64() {
+            function loadImageAsBase64(path) {
                 return new Promise((resolve) => {
-                    // First try to use the image already displayed on the page
-                    const imgElement = document.getElementById('headerLogo');
-                    if (imgElement && imgElement.complete && imgElement.naturalWidth > 0) {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = imgElement.naturalWidth;
-                            canvas.height = imgElement.naturalHeight;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(imgElement, 0, 0);
-                            const dataUrl = canvas.toDataURL('image/png');
-                            resolve(dataUrl);
-                            return;
-                        } catch (e) {
-                            // fall through to fallback
+                    // Check if the image is already loaded in the DOM (for headerLogo)
+                    if (path === './assets/logo.png') {
+                        const imgElement = document.getElementById('headerLogo');
+                        if (imgElement && imgElement.complete && imgElement.naturalWidth > 0) {
+                            try {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = imgElement.naturalWidth;
+                                canvas.height = imgElement.naturalHeight;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(imgElement, 0, 0);
+                                const dataUrl = canvas.toDataURL('image/png');
+                                resolve(dataUrl);
+                                return;
+                            } catch (e) {
+                                // fall through
+                            }
                         }
                     }
 
@@ -2324,7 +2326,12 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0);
                         try {
-                            const dataUrl = canvas.toDataURL('image/png');
+                            // Determine MIME type from file extension
+                            const ext = path.split('.').pop().toLowerCase();
+                            let mime = 'image/png';
+                            if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
+                            else if (ext === 'png') mime = 'image/png';
+                            const dataUrl = canvas.toDataURL(mime);
                             resolve(dataUrl);
                         } catch (e) {
                             resolve(null);
@@ -2333,12 +2340,12 @@
                     img.onerror = function() {
                         resolve(null);
                     };
-                    img.src = './assets/logo.png';
+                    img.src = path;
                 });
             }
 
             // ============================================================
-            // PDF GENERATION — fixed page numbering with total pages
+            // PDF GENERATION — with professional header
             // ============================================================
             async function generateClientPDF(internal) {
                 // Validate required fields
@@ -2378,25 +2385,65 @@
                 const margin = 18;
                 let y = margin;
 
-                // Load logo
-                const logoData = await loadLogoAsBase64();
+                // Load logos
+                const [pic1Data, pic2Data] = await Promise.all([
+                    loadImageAsBase64('./assets/pic1.png'),
+                    loadImageAsBase64('./assets/pic2.png')
+                ]);
 
-                // ----- HEADER: only logo, centered, with good spacing -----
+                // ----- HEADER: Left Logo | Company Text | Right Logo -----
                 let headerY = y;
-                if (logoData) {
-                    const img = new Image();
-                    img.src = logoData;
-                    const aspect = img.naturalWidth / img.naturalHeight || 2;
-                    const w = 145;
-                    const h = w / aspect;
-                    const x = (pageWidth - w) / 2;
-                    doc.addImage(logoData, 'PNG', x, headerY, w, h);
-                    headerY += h + 8;
-                } else {
-                    headerY += 8;
+
+                // Determine logo heights and positions
+                const logoHeight = 18; // mm
+                const textYOffset = 2; // mm offset for vertical centering
+
+                // Left logo (pic1.PNG)
+                if (pic1Data) {
+                    try {
+                        const img = new Image();
+                        img.src = pic1Data;
+                        const aspect = img.naturalWidth / img.naturalHeight || 1.5;
+                        const w = logoHeight * aspect;
+                        const h = logoHeight;
+                        doc.addImage(pic1Data, 'PNG', margin, headerY, w, h);
+                    } catch (e) {
+                        // ignore
+                    }
                 }
 
-                // Document title
+                // Right logo (pic2.PNG)
+                if (pic2Data) {
+                    try {
+                        const img = new Image();
+                        img.src = pic2Data;
+                        const aspect = img.naturalWidth / img.naturalHeight || 1.5;
+                        const w = logoHeight * aspect;
+                        const h = logoHeight;
+                        doc.addImage(pic2Data, 'PNG', pageWidth - margin - w, headerY, w, h);
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+
+                // Center text block
+                const centerX = pageWidth / 2;
+                const textStartY = headerY + textYOffset + 6;
+
+                // Company name - bold, larger
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.text('Mutyam Steel Pvt. Ltd.', centerX, textStartY, { align: 'center' });
+
+                // Subtitle - smaller, italic
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(9.5);
+                doc.text('Business Development Partner for TATA STRUCTURA', centerX, textStartY + 6, { align: 'center' });
+
+                // Move headerY down
+                headerY += logoHeight + 8;
+
+                // ----- PROFORMA INVOICE title -----
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(13);
                 doc.text('PROFORMA INVOICE', pageWidth / 2, headerY, { align: 'center' });
@@ -2536,7 +2583,6 @@
                         7: { cellWidth: 'auto' },
                     },
                     margin: { left: margin, right: margin },
-                    // We will add page numbers after table generation
                 });
 
                 const finalY = doc.lastAutoTable.finalY + 10;
@@ -2616,16 +2662,39 @@
                 if (internal) {
                     doc.addPage();
                     let iy = margin;
-                    if (logoData) {
-                        const img = new Image();
-                        img.src = logoData;
-                        const aspect = img.naturalWidth / img.naturalHeight || 2;
-                        const w = 145;
-                        const h = w / aspect;
-                        const x = (pageWidth - w) / 2;
-                        doc.addImage(logoData, 'PNG', x, iy, w, h);
-                        iy += h + 6;
+
+                    // Internal copy header with logos
+                    if (pic1Data) {
+                        try {
+                            const img = new Image();
+                            img.src = pic1Data;
+                            const aspect = img.naturalWidth / img.naturalHeight || 1.5;
+                            const w = logoHeight * aspect;
+                            const h = logoHeight;
+                            doc.addImage(pic1Data, 'PNG', margin, iy, w, h);
+                        } catch (e) {}
                     }
+                    if (pic2Data) {
+                        try {
+                            const img = new Image();
+                            img.src = pic2Data;
+                            const aspect = img.naturalWidth / img.naturalHeight || 1.5;
+                            const w = logoHeight * aspect;
+                            const h = logoHeight;
+                            doc.addImage(pic2Data, 'PNG', pageWidth - margin - w, iy, w, h);
+                        } catch (e) {}
+                    }
+
+                    const textStartIY = iy + 6;
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(16);
+                    doc.text('Mutyam Steel Pvt. Ltd.', pageWidth / 2, textStartIY, { align: 'center' });
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(9.5);
+                    doc.text('Business Development Partner for TATA STRUCTURA', pageWidth / 2, textStartIY + 6, { align: 'center' });
+
+                    iy += logoHeight + 10;
+
                     doc.setFontSize(16);
                     doc.setFont('helvetica', 'bold');
                     doc.text('INTERNAL COPY', pageWidth / 2, iy, { align: 'center' });
@@ -2659,7 +2728,7 @@
 
                 // ----- ADD PAGE NUMBERS (x of n) on ALL pages -----
                 const totalPages = doc.internal.getNumberOfPages();
-                const footerY = 285; // from bottom
+                const footerY = 285;
                 for (let i = 1; i <= totalPages; i++) {
                     doc.setPage(i);
                     doc.setFontSize(7);
@@ -2872,14 +2941,12 @@
                     document.getElementById('stickyAction').style.display = 'none';
                 }
 
-                // Only show toast if not already shown
                 if (!window._appInitialized) {
                     showToast('Quotation Manager ready.', 'info');
                     window._appInitialized = true;
                 }
             }
 
-            // If user already logged in, init immediately
             if (existingUser) {
                 initApp();
             }
@@ -2896,7 +2963,7 @@
                 }
             });
 
-            console.log('Mutyam Steel Quotation Manager — page numbering fixed');
+            console.log('Mutyam Steel Quotation Manager — professional header with two logos');
         })();
     </script>
 
